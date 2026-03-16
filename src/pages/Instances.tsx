@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Filter, Search, Server, Terminal, Cpu, MemoryStick, Activity, RefreshCw } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { buildServiceRoute } from '../config/routes';
+import { Search, Server, Terminal, Cpu, MemoryStick, Activity, RefreshCw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 type VpsTelemetry = {
@@ -20,13 +18,10 @@ type VpsTelemetry = {
   }>;
 };
 
-const PI_RUNTIME_BASE = (import.meta.env.VITE_PI_SERVICE_BASE_URL || '/pi').replace(/\/+$/, '');
-
 const Instances: React.FC = () => {
   const { isPrimeOwner } = useAuth();
   const [telemetry, setTelemetry] = useState<VpsTelemetry | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [search, setSearch] = useState('');
 
   const fetchTelemetry = () => {
@@ -53,7 +48,13 @@ const Instances: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchTelemetry();
+    const timer = window.setTimeout(() => {
+      fetchTelemetry();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
   }, []);
 
   const filteredPods = telemetry?.pods.filter(p => p.name.toLowerCase().includes(search.toLowerCase())) || [];

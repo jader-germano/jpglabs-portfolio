@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Activity, ShieldCheck, ShieldAlert, Lock, AlertTriangle, CheckCircle2, Terminal } from 'lucide-react';
-import { buildServiceRoute, ROUTES } from '../config/routes';
+import { Activity, ShieldCheck, ShieldAlert, AlertTriangle, CheckCircle2, Terminal } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 type GuardianData = {

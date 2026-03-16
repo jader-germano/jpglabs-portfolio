@@ -7,7 +7,6 @@ import {
   Home, Download, Server, ShieldCheck, HandCoins
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import RoadmapBoard from '../components/RoadmapBoard';
 import { ROUTES } from '../config/routes';
 import { useAuth } from '../context/AuthContext';
 import { REPOSITORY_LINKS, TECH_REFERENCE_LINKS } from '../data/documentation';
@@ -258,7 +257,6 @@ function Hub() {
             { id: 'docs', label: 'Docs', icon: FileText },
             { id: 'services', label: 'Services', icon: Globe },
             { id: 'products', label: 'Products', icon: ShoppingCart },
-            { id: 'roadmap', label: 'Roadmap', icon: Layers },
           ].map(tab => (
             <button 
               key={tab.id}
@@ -644,12 +642,6 @@ function Hub() {
                 </div>
               ))}
             </div>
-          </motion.div>
-        )}
-
-        {activeHubTab === 'roadmap' && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <RoadmapBoard />
           </motion.div>
         )}
 
