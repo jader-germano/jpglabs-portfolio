@@ -1,0 +1,61 @@
+name: Publish GitHub Release Notes
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Git tag for the release
+        required: true
+      title:
+        description: Release title
+        required: true
+      release_state:
+        description: Release state
+        required: true
+        type: choice
+        options:
+          - published
+          - draft
+          - prerelease
+      notes_count:
+        description: Number of recent publication entries to include
+        required: false
+        default: "3"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate release notes from publication log
+        run: node scripts/generate-release-notes.mjs --output release-notes.md --count "${{ inputs.notes_count }}"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_STATE: ${{ inputs.release_state }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_TITLE: ${{ inputs.title }}
+        run: |
+          FLAGS=""
+          if [ "$RELEASE_STATE" = "draft" ]; then
+            FLAGS="--draft"
+          elif [ "$RELEASE_STATE" = "prerelease" ]; then
+            FLAGS="--prerelease"
+          fi
+
+          gh release create "$RELEASE_TAG" \
+            --repo "${{ github.repository }}" \
+            --title "$RELEASE_TITLE" \
+            --notes-file release-notes.md \
+            $FLAGS

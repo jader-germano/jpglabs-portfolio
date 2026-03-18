@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /downloads
+Disallow: /docs
+Disallow: /guardian
+Disallow: /legal
+Disallow: /offer
+Disallow: /overview
+Disallow: /services
+Sitemap: https://jpglabs.com.br/sitemap.xml
