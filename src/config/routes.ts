@@ -1,24 +1,34 @@
 export const ROUTES = {
+  // ── Public ──────────────────────────────────────────────────────────────
   root: '/',
   login: '/login',
-  offer: '/offer',
-  home: '/home',
-  overview: '/overview',
-  services: '/services',
-  downloads: '/downloads',
-  docs: '/docs',
-  assetsLegacy: '/assets',
-  dashboardInstances: '/dashboard/instances',
-  guardian: '/guardian',
-  guardianLegacy: '/gardian',
-  upsell: '/upsell',
-  legal: '/legal',
-  portfolioManager: '/dashboard/portfolio-manager',
-  caseStudy: '/case-study/:slug',
   portfolioCanonical: '/portifolio/jader-germano',
   portfolioDynamic: '/portifolio/:userSlug',
   portfolioLegacy: '/portfolio',
-  hubLegacy: '/hub',
+
+  // ── Authenticated (any role) ─────────────────────────────────────────────
+  hub: '/hub',
+  legal: '/legal',
+
+  // ── Commercial (PRIME_OWNER | SUB_OWNER | USER_CONSULTANT) ───────────────
+  offer: '/offer',
+  services: '/services',
+  downloads: '/downloads',
+  docs: '/docs',
+  caseStudy: '/case-study/:slug',
+  upsell: '/upsell',
+
+  // ── Owner-only (PRIME_OWNER | SUB_OWNER) ────────────────────────────────
+  portfolioManager: '/dashboard/portfolio-manager',
+  dashboardInstances: '/dashboard/instances',
+  overview: '/overview',
+  guardian: '/guardian',
+
+  // ── Legacy redirects ─────────────────────────────────────────────────────
+  home: '/home',
+  assetsLegacy: '/assets',
+  guardianLegacy: '/gardian',
+  hubLegacy: '/hub-legacy',
 } as const;
 
 export const buildProductRoute = (slug: string): string => `${ROUTES.downloads}/${slug}`;

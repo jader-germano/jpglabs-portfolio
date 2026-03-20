@@ -1,4 +1,15 @@
-export type Role = 'PRIME_OWNER' | 'SUB_OWNER' | 'ADMIN' | 'USER_CONSULTANT' | 'USER' | 'PUBLIC';
+export type Role =
+  | 'PRIME_OWNER'
+  | 'SUB_OWNER'
+  | 'FAMILY'
+  | 'PI_AGENT'
+  | 'CLAUDE_ORCHESTRATOR'
+  | 'ADMIN'
+  | 'USER_CONSULTANT'
+  | 'USER'
+  | 'PUBLIC';
+
+export type Relation = 'self' | 'wife' | 'daughter' | 'agent' | 'consultant' | 'public';
 
 export interface User {
   id: string;

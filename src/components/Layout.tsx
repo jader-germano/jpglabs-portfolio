@@ -19,23 +19,37 @@ import { useAuth } from '../context/AuthContext';
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, isPrimeOwner, isSubOwner, logout } = useAuth();
+  const { user, isAuthenticated, isPrimeOwner, isSubOwner, isFamily, isClaudeOrchestrator, isPiAgent, logout } = useAuth();
+
+  const isCommercialUser = isPrimeOwner || isSubOwner || user?.role === 'ADMIN' || user?.role === 'USER_CONSULTANT';
+  const isOwner = isPrimeOwner || isSubOwner;
+  const isAgent = isClaudeOrchestrator || isPiAgent;
 
   const navItems = isAuthenticated
     ? [
         { label: 'Portfolio', path: ROUTES.portfolioCanonical, icon: LayoutGrid },
-        { label: 'Offer', path: ROUTES.offer, icon: BadgeDollarSign },
-        { label: 'Services', path: ROUTES.services, icon: Briefcase },
-        { label: 'Products', path: ROUTES.downloads, icon: Download },
-        { label: 'Docs', path: ROUTES.docs, icon: FileText },
+        { label: 'Hub', path: ROUTES.hub, icon: ShieldCheck },
+        ...(isCommercialUser ? [
+          { label: 'Offer', path: ROUTES.offer, icon: BadgeDollarSign },
+          { label: 'Services', path: ROUTES.services, icon: Briefcase },
+          { label: 'Products', path: ROUTES.downloads, icon: Download },
+          { label: 'Docs', path: ROUTES.docs, icon: FileText },
+        ] : []),
       ]
     : [{ label: 'Portfolio', path: ROUTES.portfolioCanonical, icon: LayoutGrid }];
 
   const ownerQuickLinks = [
-    { label: 'Pi Guardrails', path: ROUTES.docs },
-    { label: 'Portfolio Manager', path: ROUTES.portfolioManager },
-    { label: 'Terms & LGPD', path: ROUTES.legal },
+    ...(isOwner || isAgent ? [{ label: 'Portfolio Manager', path: ROUTES.portfolioManager }] : []),
+    ...(isCommercialUser ? [{ label: 'Pi Guardrails', path: ROUTES.docs }] : []),
+    { label: 'Termos & LGPD', path: ROUTES.legal },
   ];
+
+  const roleLabel = isPrimeOwner ? 'PRIME OWNER'
+    : isSubOwner ? 'SUB OWNER'
+    : isFamily ? 'FAMÍLIA'
+    : isClaudeOrchestrator ? 'CLAW'
+    : isPiAgent ? 'PI AGENT'
+    : user?.role ?? 'USER';
 
   const isItemActive = (path: string): boolean => {
     if (path === ROUTES.portfolioCanonical) {
@@ -92,7 +106,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     {user?.name?.split(' ')[0]}
                   </span>
                   <span className="text-[7px] font-bold uppercase text-blue-400 tracking-widest">
-                    {isPrimeOwner ? 'PRIME OWNER' : isSubOwner ? 'SUB OWNER' : user?.role}
+                    {roleLabel}
                   </span>
                 </div>
                 <button

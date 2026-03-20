@@ -16,6 +16,7 @@ import ServicesPage from './pages/Services';
 import LoginPage from './pages/Login';
 import DocsPage from './pages/Docs';
 import PortfolioManagerPage from './pages/PortfolioManager';
+import HubPage from './pages/Hub';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function ExternalRedirect({ to }: { to: string }) {
@@ -41,54 +42,17 @@ function AppRoutes() {
             <Route path={ROUTES.portfolioDynamic} element={<PortfolioPage />} />
             <Route path={ROUTES.portfolioLegacy} element={<Navigate to={ROUTES.portfolioCanonical} replace />} />
 
+            {/* ── Hub (any authenticated) ──────────────────────────────── */}
             <Route
-              path={ROUTES.offer}
+              path={ROUTES.hub}
               element={
                 <ProtectedRoute>
-                  <OfferPage />
+                  <HubPage />
                 </ProtectedRoute>
               }
             />
-            <Route
-              path={ROUTES.services}
-              element={
-                <ProtectedRoute>
-                  <ServicesPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path={ROUTES.downloads}
-              element={
-                <ProtectedRoute>
-                  <DownloadsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path={ROUTES.docs}
-              element={
-                <ProtectedRoute>
-                  <DocsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path={ROUTES.portfolioManager}
-              element={
-                <ProtectedRoute roles={['PRIME_OWNER', 'SUB_OWNER']}>
-                  <PortfolioManagerPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path={ROUTES.caseStudy}
-              element={
-                <ProtectedRoute>
-                  <CaseStudyPage />
-                </ProtectedRoute>
-              }
-            />
+
+            {/* ── Legal (any authenticated) ─────────────────────────────── */}
             <Route
               path={ROUTES.legal}
               element={
@@ -98,54 +62,81 @@ function AppRoutes() {
               }
             />
 
+            {/* ── Commercial routes (blocks FAMILY + agents) ────────────── */}
+            <Route
+              path={ROUTES.offer}
+              element={
+                <ProtectedRoute commercialOnly>
+                  <OfferPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.services}
+              element={
+                <ProtectedRoute commercialOnly>
+                  <ServicesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.downloads}
+              element={
+                <ProtectedRoute commercialOnly>
+                  <DownloadsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.docs}
+              element={
+                <ProtectedRoute commercialOnly>
+                  <DocsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.caseStudy}
+              element={
+                <ProtectedRoute commercialOnly>
+                  <CaseStudyPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.upsell}
+              element={
+                <ProtectedRoute commercialOnly>
+                  <ExternalRedirect to="/pi" />
+                </ProtectedRoute>
+              }
+            />
+
             {PRODUCT_CATALOG.map((product) => (
               <Route
                 key={product.id}
                 path={`${ROUTES.downloads}/${product.slug}`}
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute commercialOnly>
                     <ProductDetailPage slug={product.slug} />
                   </ProtectedRoute>
                 }
               />
             ))}
 
+            {/* ── Owner-only routes ─────────────────────────────────────── */}
             <Route
-              path={ROUTES.hubLegacy}
+              path={ROUTES.portfolioManager}
               element={
-                <ProtectedRoute>
-                  <ExternalRedirect to="/pi" />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path={ROUTES.assetsLegacy}
-              element={
-                <ProtectedRoute>
-                  <Navigate to={ROUTES.downloads} replace />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path={ROUTES.guardianLegacy}
-              element={
-                <ProtectedRoute>
-                  <ExternalRedirect to="/pi" />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path={ROUTES.home}
-              element={
-                <ProtectedRoute>
-                  <ExternalRedirect to="/pi" />
+                <ProtectedRoute roles={['PRIME_OWNER', 'SUB_OWNER', 'CLAUDE_ORCHESTRATOR']}>
+                  <PortfolioManagerPage />
                 </ProtectedRoute>
               }
             />
             <Route
               path={ROUTES.dashboardInstances}
               element={
-                <ProtectedRoute>
+                <ProtectedRoute roles={['PRIME_OWNER', 'SUB_OWNER']}>
                   <ExternalRedirect to="/pi" />
                 </ProtectedRoute>
               }
@@ -153,7 +144,7 @@ function AppRoutes() {
             <Route
               path={`${ROUTES.dashboardInstances}/:serviceSlug`}
               element={
-                <ProtectedRoute>
+                <ProtectedRoute roles={['PRIME_OWNER', 'SUB_OWNER']}>
                   <ExternalRedirect to="/pi" />
                 </ProtectedRoute>
               }
@@ -161,7 +152,7 @@ function AppRoutes() {
             <Route
               path={ROUTES.overview}
               element={
-                <ProtectedRoute>
+                <ProtectedRoute roles={['PRIME_OWNER', 'SUB_OWNER']}>
                   <ExternalRedirect to="/pi" />
                 </ProtectedRoute>
               }
@@ -169,19 +160,16 @@ function AppRoutes() {
             <Route
               path={ROUTES.guardian}
               element={
-                <ProtectedRoute>
+                <ProtectedRoute roles={['PRIME_OWNER', 'SUB_OWNER']}>
                   <ExternalRedirect to="/pi" />
                 </ProtectedRoute>
               }
             />
-            <Route
-              path={ROUTES.upsell}
-              element={
-                <ProtectedRoute>
-                  <ExternalRedirect to="/pi" />
-                </ProtectedRoute>
-              }
-            />
+
+            {/* ── Legacy redirects ──────────────────────────────────────── */}
+            <Route path={ROUTES.assetsLegacy} element={<Navigate to={ROUTES.downloads} replace />} />
+            <Route path={ROUTES.guardianLegacy} element={<Navigate to={ROUTES.guardian} replace />} />
+            <Route path={ROUTES.home} element={<Navigate to={ROUTES.hub} replace />} />
             <Route path="*" element={<Navigate to={ROUTES.portfolioCanonical} replace />} />
           </Routes>
         </Layout>

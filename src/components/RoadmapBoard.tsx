@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { ArrowUpRight, CircleDot, Filter } from 'lucide-react';
-import { ROADMAP_ITEMS, type RoadmapItem, type RoadmapPriority, type RoadmapStatus } from '../data/roadmap';
+import {
+  CURRENT_EXECUTION_PRIORITY_INDEX,
+  ROADMAP_ITEMS,
+  type RoadmapItem,
+  type RoadmapPriority,
+  type RoadmapStatus,
+} from '../data/roadmap';
 
 const priorityOrder: Record<RoadmapPriority, number> = {
   critical: 0,
@@ -59,6 +65,15 @@ const RoadmapBoard = ({
     const statusMatches = statusFilter === 'all' || item.status === statusFilter;
     return areaMatches && priorityMatches && statusMatches;
   }).sort((left, right) => {
+    const leftExecutionIndex =
+      CURRENT_EXECUTION_PRIORITY_INDEX[left.id as keyof typeof CURRENT_EXECUTION_PRIORITY_INDEX] ?? Number.MAX_SAFE_INTEGER;
+    const rightExecutionIndex =
+      CURRENT_EXECUTION_PRIORITY_INDEX[right.id as keyof typeof CURRENT_EXECUTION_PRIORITY_INDEX] ?? Number.MAX_SAFE_INTEGER;
+
+    if (leftExecutionIndex !== rightExecutionIndex) {
+      return leftExecutionIndex - rightExecutionIndex;
+    }
+
     const priorityDelta = priorityOrder[left.priority] - priorityOrder[right.priority];
     if (priorityDelta !== 0) {
       return priorityDelta;
