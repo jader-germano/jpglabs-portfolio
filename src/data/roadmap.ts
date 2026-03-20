@@ -18,23 +18,97 @@ export interface RoadmapItem {
   deliverables: string[];
   dependencies: string[];
   links?: RoadmapLink[];
+  cadence?: string;
+  sourceOfTruth?: string;
+  executionMode?: string;
 }
 
 export const ROADMAP_ITEMS: RoadmapItem[] = [
+  {
+    id: 'pi-portfolio-sync-lane',
+    title: 'PI to portfolio publication lane',
+    area: 'Portfolio',
+    priority: 'critical',
+    status: 'next',
+    ownerAgent: 'Agent Broadcast',
+    skillTrack: 'PI Portfolio Sync',
+    summary:
+      'Keep everything PI ships public-safe, evidence-backed and visible: MCP positioning, product assets, speech/mobile proof, and the live roadmap that turns internal work into portfolio credibility without overstating runtime readiness.',
+    deliverables: [
+      'Mirror PI and MCP milestones across PublicHome, Portfolio, Downloads and sales collateral',
+      'Regenerate PDF kits, ebook covers and launch assets when positioning or offer copy changes',
+      'Capture public-safe release notes from each PI cycle and route them into roadmap, docs and portfolio references',
+      'Only publish MCP, voice, research and runtime claims that are backed by current contracts, logs or authenticated operator evidence',
+      'Hand off repetitive sync tasks to spawned agents operating under the pi-portfolio-sync skill',
+    ],
+    dependencies: ['Canonical PI workspace outputs available', 'Public-safe copy review before publication', 'piphone-oauth-handoff — autenticação real em produção antes de publicar surfaces autenticadas'],
+    links: [
+      { label: 'Portfolio surface', href: '/portifolio/jader-germano' },
+      { label: 'Downloads lane', href: '/downloads' },
+    ],
+    cadence: 'Weekly',
+    sourceOfTruth: 'PI runtime, portfolio repo and session artifacts',
+    executionMode: 'Spawned agents + owner review',
+  },
+  {
+    id: 'pi-mcp-proof-surface',
+    title: 'PI Control and MCP proof surface',
+    area: 'AI Product',
+    priority: 'high',
+    status: 'now',
+    ownerAgent: 'Agent Relay',
+    skillTrack: 'MCP Productization',
+    summary:
+      'Turn PI Control, MCP readiness, voice routing and client integrations into a single proof surface that explains why JPG Labs can ship AI systems beyond demos.',
+    deliverables: [
+      'Publish public-safe PI Control and MCP operator/public-lane messaging',
+      'Connect health, readiness, speech and client integration evidence into offer pages and downloads',
+      'Gate MCP, deep research and voice-readiness claims behind documented contracts and authenticated runtime evidence',
+      'Keep the portfolio aligned with VPS, Cloudflare and security improvements without leaking private operations details',
+      'Package the operator story so it supports service-led sales and future SaaS positioning',
+    ],
+    dependencies: ['Current PI Control readiness work', 'Public-safe product narrative approved', 'Doc-backed MCP and voice criteria agreed before publication'],
+    links: [
+      { label: 'Pi service surface', href: 'https://jpglabs.com.br/pi' },
+      { label: 'Offer lane', href: '/offer' },
+    ],
+    cadence: 'Biweekly',
+    sourceOfTruth: 'pi-control-app, pi-local-app and product assets',
+    executionMode: 'Spawned agents + release checklist',
+  },
+  {
+    id: 'money-pi-cost-intelligence',
+    title: 'Money Pi as the next system after the current roadmap',
+    area: 'Finance Platform',
+    priority: 'high',
+    status: 'next',
+    ownerAgent: 'Agent Ledger',
+    skillTrack: 'Financial Operations',
+    summary:
+      'Spin up Money Pi right after the current Pi/portfolio stabilization roadmap so operational cost tracking, revenue visibility and finance workflows stop living as loose notes.',
+    deliverables: [
+      'Create the first cost-ledger lane for sessions, infrastructure and paid APIs',
+      'Define the initial finance data model for expenses, revenue and delivery costs',
+      'Link Pi service session metadata to cost entries where possible',
+      'Prepare the first web surface for cost visibility and manual reconciliation',
+    ],
+    dependencies: ['Current portfolio and Pi stabilization roadmap completed', 'Canonical Money Pi docs and workspace ready'],
+  },
   {
     id: 'dashboard-hardening',
     title: 'Dashboard hardening and live operational visibility',
     area: 'Dashboard',
     priority: 'critical',
-    status: 'now',
+    status: 'next',
     ownerAgent: 'Agent Atlas',
     skillTrack: 'Infra Visibility',
     summary:
-      'Continue replacing synthetic dashboard confidence with live operational checkpoints after the first real Pi runtime integration shipped.',
+      'Finish the public/private split so the portfolio remains the only anonymous proof-of-work surface while live operational checkpoints stay behind authenticated access.',
     deliverables: [
       '✅ Fix root-domain 404 on jpglabs.com.br',
       '✅ Replace mock Instances and Guardian cards with live Pi runtime summaries',
-      '✅ Publish a live Pi runtime snapshot on the public home and dashboard lanes',
+      '✅ Retire the public live Pi runtime snapshot from anonymous surfaces',
+      'Route dashboard, docs, downloads and legal lanes through authenticated entry points only',
       'Validate n8n TLS chain and Cloudflare/Traefik routing',
       'Wire actionable filters and search into Instances',
       'Expose incident, SLA and dependency summaries in Overview',
@@ -47,25 +121,48 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     title: 'Portfolio experience expansion and solution library',
     area: 'Portfolio',
     priority: 'high',
-    status: 'now',
+    status: 'next',
     ownerAgent: 'Agent Mercury',
     skillTrack: 'Experience Design',
     summary:
-      'Turn the portfolio into a proof-of-work surface with detailed experiences, shipped solutions and versioned technology references.',
+      'Turn the portfolio into a proof-of-work surface with detailed experiences, shipped solutions, and public-safe references while PI_MEMORY stays private and canonical.',
     deliverables: [
       'Expand each experience with concrete solutions and outcomes',
       'List GitHub sources and version-aware framework/language references',
       'Add links to documentation for Java 21, Angular 20, React 19, Vite 7, n8n and Docker',
+      'Keep roadmap and reference copy public-safe while canonical Pi memory stays service-controlled',
       'Ingest CV data as a source for portfolio copy refinement',
     ],
     dependencies: ['CV normalization and repo-to-solution mapping'],
+  },
+  {
+    id: 'portfolio-guardrails',
+    title: 'Portfolio guardrails & Pi memory references',
+    area: 'Security',
+    priority: 'high',
+    status: 'now',
+    ownerAgent: 'Agent Atlas',
+    skillTrack: 'Security & Governance',
+    summary:
+      'Highlight the Pi service guardrails, PI_MEMORY canonical context, session-log discipline, and owner/sub-owner access story throughout the portfolio narrative.',
+    deliverables: [
+      'Reference the Pi service constitution and PI_MEMORY as the canonical private sources behind the portfolio story.',
+      'Note the OWNER_PRIME and Ayumi SUB_OWNER flow in the login access copy and nav messaging.',
+      'Describe Prompt Change Awareness and the on-load previous-activity check as operator safety features without exposing private session contents.',
+      'Call out LGPD, trusted auth, and guarded doc workflows as part of the project references.',
+    ],
+    dependencies: ['Portfolio access flow stability', 'Pi service constitution published'],
+    links: [
+      { label: 'Pi service surface', href: 'https://jpglabs.com.br/pi' },
+      { label: 'Portfolio release docs', href: '/docs' },
+    ],
   },
   {
     id: 'docs-unification',
     title: 'Unified documentation repository with solution sections',
     area: 'Documentation',
     priority: 'critical',
-    status: 'next',
+    status: 'now',
     ownerAgent: 'Agent Scribe',
     skillTrack: 'Docs Architecture',
     summary:
@@ -73,13 +170,14 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     deliverables: [
       'Create a dedicated docs repo with platform and solution sections',
       'Archive duplicate workflow exports and remove path leakage',
+      'Reference PI_MEMORY and the service registry as canonical private governance sources',
       'Split sensitive operations notes from public-facing docs',
       'Publish canonical links back into the portfolio system',
     ],
     dependencies: ['Secret sanitization and migration matrix approval'],
     links: [
       { label: 'JPGLabs Platform Repo', href: 'https://github.com/jader-germano/jpglabs' },
-      { label: 'JPGLabs AI Assets', href: 'https://github.com/jader-germano/jpglabs-ai-assets' },
+      { label: 'Portfolio release docs', href: '/docs' },
     ],
   },
   {
@@ -87,7 +185,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     title: 'Repository split and naming clarity for frontend and backend',
     area: 'Platform Strategy',
     priority: 'critical',
-    status: 'next',
+    status: 'now',
     ownerAgent: 'Agent Boundary',
     skillTrack: 'Repo Governance',
     summary:
@@ -105,7 +203,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     title: 'Next backend foundation with business-scale constraints',
     area: 'Backend',
     priority: 'critical',
-    status: 'now',
+    status: 'next',
     ownerAgent: 'Agent Atlas',
     skillTrack: 'Backend Architecture',
     summary:
@@ -126,7 +224,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     title: 'Public frontend and Next backend contract adoption',
     area: 'Frontend Platform',
     priority: 'high',
-    status: 'next',
+    status: 'now',
     ownerAgent: 'Agent Boundary',
     skillTrack: 'Contract Integration',
     summary:
@@ -162,7 +260,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     title: 'Resume upload discovery before implementation lock-in',
     area: 'Product Discovery',
     priority: 'high',
-    status: 'now',
+    status: 'next',
     ownerAgent: 'Agent Intake',
     skillTrack: 'Requirements Discovery',
     summary:
@@ -197,7 +295,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
       'Parity rules in place for the Next backend and Java + Quarkus services behind the load balancer',
     ],
     links: [
-      { label: 'Architecture Note', href: '/docs/reactive-backend-migration.md' },
+      { label: 'Architecture Note', href: '/docs' },
       { label: 'Expo Docs', href: 'https://docs.expo.dev/' },
     ],
   },
@@ -239,6 +337,32 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     links: [{ label: 'JPGLabs n8n Repo', href: 'https://github.com/jader-germano/jpglabs' }],
   },
   {
+    id: 'agentic-service-foundation-lane',
+    title: 'PI + MCP agentic service foundation product lane',
+    area: 'Productization',
+    priority: 'critical',
+    status: 'next',
+    ownerAgent: 'Agent Intake',
+    skillTrack: 'Notion + Codex Service Factory',
+    summary:
+      'Package the PI/MCP intake-to-foundation workflow as a repeatable product that can turn service requirements into database guidance, contracts, backlog and roadmap without pretending chat-only models are enough.',
+    deliverables: [
+      'Keep a mandatory intake schema for service personalization work',
+      'Generate database foundation and contract notes before UI-first delivery',
+      'Translate intake gaps into explicit blockers and roadmap items',
+      'Publish the product story, ebook and downloads on the portfolio without hiding the agentic requirement',
+    ],
+    dependencies: ['Canonical product and asset roots inside jpglabs', 'Notion MCP login after restart for synced capture'],
+    links: [
+      { label: 'Offer lane', href: '/offer' },
+      { label: 'Product downloads', href: '/downloads/pi-mcp-agentic-service-foundation' },
+      { label: 'Docs lane', href: '/docs' },
+    ],
+    cadence: 'Per new intake + weekly sync',
+    sourceOfTruth: 'products/pi-mcp-agentic-service-foundation and portfolio catalog',
+    executionMode: 'Codex automation + owner review + later Notion sync',
+  },
+  {
     id: 'pdf-private-product-line',
     title: 'Private product repository and premium PDF redesign',
     area: 'Assets',
@@ -261,7 +385,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     title: 'PT / EN / ES internationalization',
     area: 'Experience',
     priority: 'high',
-    status: 'planned',
+    status: 'now',
     ownerAgent: 'Agent Babel',
     skillTrack: 'Localization',
     summary:
@@ -304,8 +428,8 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
       'Reevaluate the local-LLM lane against current hosted frontier models and define which workloads should stay local versus external.',
     deliverables: [
       'Benchmark latency, cost, privacy and ops burden per workload class',
-      'Compare local Llama stack against Claude Sonnet and GPT-5 / ChatGPT line',
-      'Define routing policy for coding, support, automation and retrieval tasks',
+      'Compare local Llama stack against Claude Sonnet and GPT-5 / ChatGPT line with separate tracks for compaction, coding, voice, retrieval and deep research',
+      'Define routing policy for coding, support, automation, speech, and retrieval tasks',
       'Recommend fallback and cache strategy for hybrid operation',
     ],
     dependencies: ['Current usage traces from Ollama/open-webui and hosted API pricing'],
@@ -333,7 +457,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     ],
     dependencies: ['Current Next backend ownership, contract boundaries and load-balancer routing strategy'],
     links: [
-      { label: 'Architecture Note', href: '/docs/reactive-backend-migration.md' },
+      { label: 'Architecture Note', href: '/docs' },
       { label: 'Node.js Docs', href: 'https://nodejs.org/en/docs' },
       { label: 'Quarkus Docs', href: 'https://quarkus.io/' },
     ],
@@ -343,7 +467,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     title: 'Full VPS reboot and Hostinger MCP viability check',
     area: 'Infrastructure',
     priority: 'high',
-    status: 'next',
+    status: 'now',
     ownerAgent: 'Agent Edge',
     skillTrack: 'Infra Control',
     summary:
@@ -361,7 +485,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     title: 'Portfolio preview CI/CD lane for the backend track',
     area: 'Release Engineering',
     priority: 'high',
-    status: 'next',
+    status: 'now',
     ownerAgent: 'Agent Launch',
     skillTrack: 'Preview Delivery',
     summary:
@@ -379,7 +503,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     title: 'Local Docker platform parity before VPS cutover',
     area: 'Platform',
     priority: 'high',
-    status: 'planned',
+    status: 'now',
     ownerAgent: 'Agent Forge',
     skillTrack: 'Local Platform',
     summary:
@@ -397,7 +521,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     title: 'Local Kubernetes and CI/CD parity for the full platform',
     area: 'Platform',
     priority: 'foundation',
-    status: 'planned',
+    status: 'now',
     ownerAgent: 'Agent Launch',
     skillTrack: 'Platform Delivery',
     summary:
@@ -415,7 +539,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     title: 'Final Java + Quarkus replica after VPS deployment',
     area: 'Architecture',
     priority: 'foundation',
-    status: 'planned',
+    status: 'now',
     ownerAgent: 'Agent Reactor',
     skillTrack: 'Replica Architecture',
     summary:
@@ -427,6 +551,135 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
       'Introduce the replica behind the shared edge only after stability proof',
     ],
     dependencies: ['Next backend deployed on VPS', 'Supabase contract documentation frozen', 'Platform topology stabilized after Epic 10'],
+  },
+  {
+    id: 'piphone-oauth-handoff',
+    title: 'PiPhone OAuth + Pi Handoff Criptografado',
+    area: 'Auth / Mobile',
+    priority: 'critical',
+    status: 'now',
+    ownerAgent: 'Agent Gate',
+    skillTrack: 'OAuth + Mobile Auth',
+    summary:
+      'Substituir o AuthContext baseado em MOCK_USERS + localStorage por autenticação real via OAuth (Apple, GitHub, Google), com handoff criptografado ao Pi Service. O PiPhone conecta ao Pi após login social, gerando um token HMAC-SHA256 com TTL e escopos por role. Usuários não cadastrados entram em fila PENDING e são aprovados manualmente pelo PRIME_OWNER.',
+    deliverables: [
+      'Backend: providers Apple, GitHub e Google no NextAuth authOptions',
+      'Backend: Prisma schema com accounts, sessions, verification_tokens para NextAuth adapter',
+      'Backend: Supabase portal_users com role, subscription_tier, provider_id',
+      'Backend: POST /api/auth/request-access para usuários novos (status PENDING)',
+      'Backend: GET /api/admin/auth-requests para listagem de pendentes (PRIME_OWNER)',
+      'Pi Service: POST /auth/handoff — JWT → token Pi criptografado (HMAC-SHA256, TTL 24h / 5min agentes)',
+      'Pi Service: GET /auth/handoff/status — verifica validade do token',
+      'Frontend: AuthContext MOCK_USERS → useSession next-auth/react',
+      'Frontend: somente piHandoffToken em localStorage (curta duração)',
+      'Mobile: 6 telas — Splash, Login OAuth, Pending Approval, Home/Pi Status, Profile+LGPD, Approvals (PRIME_OWNER)',
+    ],
+    dependencies: [
+      'hub-vs-main-cleanup — branch codex/epics/pi-portfolio-runtime mergeada em main',
+      'Supabase portal_users e auth_requests operacionais',
+      'Apple Developer — Sign In with Apple configurado',
+      'GitHub OAuth App e Google OAuth credentials criados',
+    ],
+    links: [
+      { label: 'Pi Service', href: 'https://jpglabs.com.br/pi' },
+      { label: 'approve-auth endpoint', href: '/api/admin/approve-auth' },
+    ],
+    cadence: 'Sprint único — implementação faseada',
+    sourceOfTruth: 'jpglabs-portfolio-frontend + jpglabs-portfolio-backend + jpglabs-portifolio-mobile',
+    executionMode: 'Codex + owner review por fase',
+  },
+  {
+    id: 'pi-session-dashboard-view',
+    title: 'Pi Session → Dashboard/Roadmap View Control (Live)',
+    area: 'Dashboard',
+    priority: 'high',
+    status: 'next',
+    ownerAgent: 'Agent Atlas',
+    skillTrack: 'Pi Portfolio Sync',
+    summary:
+      'O Pi já atualiza uma view de estado por sessão dentro do portfolio. Transformar esse comportamento em um controle visual permanente no Dashboard: um painel que mostra roadmap atualizado em tempo real a partir das sessões Pi, sem precisar de deploy manual. Cada session.sync do Pi reflete imediatamente no RoadmapBoard do dashboard.',
+    deliverables: [
+      'Endpoint Pi: GET /sessions/latest-view — retorna o último estado de view gerado por session.sync',
+      'Endpoint Pi: GET /roadmap/delta — diff entre roadmap.ts canônico e estado atual do Pi memory',
+      'Frontend: componente LiveRoadmapSync no Dashboard — polling /sessions/latest-view a cada 60s (autenticado)',
+      'Frontend: badge "Atualizado por Pi Session" com timestamp no RoadmapBoard',
+      'Frontend: botão "Forçar Sync" visível para PRIME_OWNER — chama POST /sessions/sync manualmente',
+      'Backend: proxy autenticado /api/pi/sessions/latest-view para não expor Pi token no frontend',
+    ],
+    dependencies: [
+      'piphone-oauth-handoff — autenticação real em produção',
+      'Pi Service endpoint /sessions/latest-view implementado',
+      'Dashboard hardening (authenticated routes) completo',
+    ],
+    links: [
+      { label: 'RoadmapBoard component', href: '/dashboard/portfolio-manager' },
+      { label: 'Pi Service', href: 'https://jpglabs.com.br/pi' },
+    ],
+    cadence: 'Por sessão Pi (event-driven)',
+    sourceOfTruth: 'Pi session.sync → portfolio RoadmapBoard',
+    executionMode: 'Pi publica → frontend consome via proxy autenticado',
+  },
+  {
+    id: 'ai-sdk-migration-eval',
+    title: 'Avaliação de migração para Vercel AI SDK (ai-sdk.dev)',
+    area: 'AI Platform',
+    priority: 'high',
+    status: 'next',
+    ownerAgent: 'Agent Cortex',
+    skillTrack: 'Model Strategy',
+    summary:
+      'Avaliar se o backend Next da JPGLabs deve migrar para o Vercel AI SDK (ai-sdk.dev) como camada de abstração unificada para LLMs, streaming, tool-calling e agentes. O Pi hoje usa chamadas diretas à API Anthropic — o AI SDK traria streaming padronizado, suporte multi-provider (Anthropic, OpenAI, Google, Groq) e primitivas de agente prontas.',
+    deliverables: [
+      'Análise de compatibilidade: Next.js 14+ App Router + AI SDK v4 (useChat, useCompletion, streamText)',
+      'Comparação de DX: chamadas diretas Anthropic SDK vs AI SDK wrapper',
+      'Benchmark: latência e overhead do AI SDK em rota streaming vs implementação atual',
+      'Mapa de migração: quais rotas do backend seriam afetadas (/api/resume/parse, future /api/pi/chat)',
+      'Avaliação de tool-calling e agent primitives (generateObject, streamObject, agent loop)',
+      'Decisão documentada: migrar / adotar parcialmente / manter abordagem atual',
+      'Se aprovado: ADR (Architecture Decision Record) e plano de migração faseada',
+    ],
+    dependencies: [
+      'piphone-oauth-handoff em produção (base estável antes de mudar a camada LLM)',
+      'Rotas de LLM do backend mapeadas',
+    ],
+    links: [
+      { label: 'Vercel AI SDK', href: 'https://ai-sdk.dev' },
+      { label: 'AI SDK Docs', href: 'https://sdk.vercel.ai/docs' },
+      { label: 'Anthropic Provider', href: 'https://sdk.vercel.ai/providers/ai-sdk-providers/anthropic' },
+    ],
+    cadence: 'Spike de 1-2 dias antes da decisão',
+    sourceOfTruth: 'ADR no repo + backlog Pi',
+    executionMode: 'Research spike + benchmarks + ADR',
+  },
+  {
+    id: 'piphone-subscription-tier',
+    title: 'Sistema de Subscription PiPhone (free / operator / premium)',
+    area: 'Monetização',
+    priority: 'high',
+    status: 'planned',
+    ownerAgent: 'Agent Ledger',
+    skillTrack: 'Subscription & Billing',
+    summary:
+      'Após o OAuth em produção, introduzir planos de assinatura para controlar acesso ao Pi e aos produtos JPGLabs. O campo subscription_tier em portal_users habilita gates de funcionalidade sem alterar o sistema de roles. Integração futura com Stripe para cobranças recorrentes.',
+    deliverables: [
+      'Escopos por tier: free (acesso limitado), operator (acesso pleno), premium (futuro)',
+      'subscription_tier no portal_users e no JWT handoff do Pi',
+      'Gates de funcionalidade no frontend e mobile baseados em tier',
+      'Tela de upgrade no PiPhone (Perfil → Planos)',
+      'Stripe: produtos, preços e webhooks para sincronizar tier no Supabase',
+      'LGPD: consentimento explícito antes da primeira cobrança',
+    ],
+    dependencies: [
+      'piphone-oauth-handoff em produção',
+      'Stripe onboarding completo',
+    ],
+    links: [
+      { label: 'Stripe Dashboard', href: 'https://dashboard.stripe.com' },
+      { label: 'Pi Service', href: 'https://jpglabs.com.br/pi' },
+    ],
+    cadence: 'Pós-estabilização do OAuth',
+    sourceOfTruth: 'Stripe + Supabase portal_users.subscription_tier',
+    executionMode: 'Codex + Stripe webhooks + owner approval',
   },
   {
     id: 'deploy-8082',
@@ -449,3 +702,33 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
 ];
 
 export const ROADMAP_AREAS = ['All', ...new Set(ROADMAP_ITEMS.map((item) => item.area))];
+
+export const CURRENT_EXECUTION_PRIORITY_IDS = [
+  'piphone-oauth-handoff',
+  'ai-sdk-migration-eval',
+  'pi-session-dashboard-view',
+  'docs-unification',
+  'repo-split-frontend-backend',
+  'frontend-backend-contract-adoption',
+  'portfolio-guardrails',
+  'i18n-pt-en-es',
+  'cloudflare-dns-mail',
+  'vps-reboot-and-hostinger-mcp',
+  'portfolio-preview-cicd-lane',
+  'pi-mcp-proof-surface',
+  'n8n-runbook-secrets',
+  'deploy-8082',
+  'local-platform-compose-parity',
+  'local-k8s-ci-cd-parity',
+  'final-java-quarkus-replica',
+] as const;
+
+export const CURRENT_EXECUTION_PRIORITY_INDEX = Object.fromEntries(
+  CURRENT_EXECUTION_PRIORITY_IDS.map((id, index) => [id, index]),
+) as Record<(typeof CURRENT_EXECUTION_PRIORITY_IDS)[number], number>;
+
+const PORTFOLIO_ACTIVE_ROADMAP_IDS = CURRENT_EXECUTION_PRIORITY_IDS;
+
+export const PORTFOLIO_ACTIVE_ROADMAP = ROADMAP_ITEMS.filter((item) =>
+  PORTFOLIO_ACTIVE_ROADMAP_IDS.includes(item.id as (typeof PORTFOLIO_ACTIVE_ROADMAP_IDS)[number]),
+);
