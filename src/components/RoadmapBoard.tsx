@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { ArrowUpRight, CircleDot, Filter } from 'lucide-react';
-import { ROADMAP_AREAS, ROADMAP_ITEMS, type RoadmapPriority, type RoadmapStatus } from '../data/roadmap';
+import {
+  CURRENT_EXECUTION_PRIORITY_INDEX,
+  ROADMAP_ITEMS,
+  type RoadmapItem,
+  type RoadmapPriority,
+  type RoadmapStatus,
+} from '../data/roadmap';
 
 const priorityOrder: Record<RoadmapPriority, number> = {
   critical: 0,
@@ -30,17 +36,44 @@ const statusStyles: Record<RoadmapStatus, string> = {
   research: 'text-purple-300 bg-purple-500/10 border-purple-500/10',
 };
 
-const RoadmapBoard = () => {
+interface RoadmapBoardProps {
+  items?: RoadmapItem[];
+  eyebrow?: string;
+  titlePrefix?: string;
+  titleAccent?: string;
+  description?: string;
+  showFilters?: boolean;
+}
+
+const RoadmapBoard = ({
+  items = ROADMAP_ITEMS,
+  eyebrow = 'Interactive Prioritization',
+  titlePrefix = 'Continuous',
+  titleAccent = 'Roadmap',
+  description = 'This board turns the current JPG Labs priorities into executable tracks, with explicit agent ownership, dependencies and release intent.',
+  showFilters = true,
+}: RoadmapBoardProps) => {
   const [areaFilter, setAreaFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState<'all' | RoadmapPriority>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | RoadmapStatus>('all');
 
-  const visibleItems = ROADMAP_ITEMS.filter((item) => {
+  const areas = showFilters ? ['All', ...new Set(items.map((item) => item.area))] : ['All'];
+
+  const visibleItems = items.filter((item) => {
     const areaMatches = areaFilter === 'All' || item.area === areaFilter;
     const priorityMatches = priorityFilter === 'all' || item.priority === priorityFilter;
     const statusMatches = statusFilter === 'all' || item.status === statusFilter;
     return areaMatches && priorityMatches && statusMatches;
   }).sort((left, right) => {
+    const leftExecutionIndex =
+      CURRENT_EXECUTION_PRIORITY_INDEX[left.id as keyof typeof CURRENT_EXECUTION_PRIORITY_INDEX] ?? Number.MAX_SAFE_INTEGER;
+    const rightExecutionIndex =
+      CURRENT_EXECUTION_PRIORITY_INDEX[right.id as keyof typeof CURRENT_EXECUTION_PRIORITY_INDEX] ?? Number.MAX_SAFE_INTEGER;
+
+    if (leftExecutionIndex !== rightExecutionIndex) {
+      return leftExecutionIndex - rightExecutionIndex;
+    }
+
     const priorityDelta = priorityOrder[left.priority] - priorityOrder[right.priority];
     if (priorityDelta !== 0) {
       return priorityDelta;
@@ -52,16 +85,16 @@ const RoadmapBoard = () => {
   return (
     <section className="py-24 px-6 max-w-7xl mx-auto">
       <div className="max-w-3xl mb-14">
-        <p className="text-[10px] font-black uppercase tracking-[0.35em] text-blue-500 mb-4">Interactive Prioritization</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.35em] text-blue-500 mb-4">{eyebrow}</p>
         <h2 className="text-5xl md:text-7xl font-black text-white uppercase tracking-tighter mb-5">
-          Continuous <span className="text-blue-500 italic">Roadmap</span>
+          {titlePrefix} <span className="text-blue-500 italic">{titleAccent}</span>
         </h2>
         <p className="text-gray-400 text-lg leading-relaxed">
-          This board turns the current JPG Labs priorities into executable tracks, with explicit agent ownership,
-          dependencies and release intent.
+          {description}
         </p>
       </div>
 
+      {showFilters ? (
       <div className="rounded-[32px] border border-white/5 bg-[#111214]/50 p-6 backdrop-blur-sm mb-10">
         <div className="flex items-center gap-3 mb-6 text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">
           <Filter size={14} className="text-blue-500" />
@@ -70,7 +103,7 @@ const RoadmapBoard = () => {
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
           <div className="flex flex-wrap gap-2">
-            {ROADMAP_AREAS.map((area) => (
+            {areas.map((area) => (
               <button
                 key={area}
                 type="button"
@@ -121,6 +154,7 @@ const RoadmapBoard = () => {
           </div>
         </div>
       </div>
+      ) : null}
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {visibleItems.map((item) => (
@@ -144,6 +178,26 @@ const RoadmapBoard = () => {
 
             <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-3">{item.title}</h3>
             <p className="text-gray-400 leading-relaxed mb-6">{item.summary}</p>
+
+            {item.cadence || item.sourceOfTruth || item.executionMode ? (
+              <div className="flex flex-wrap gap-2 mb-6">
+                {item.cadence ? (
+                  <span className="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-[9px] font-black uppercase tracking-[0.2em] text-gray-300">
+                    Cadence: {item.cadence}
+                  </span>
+                ) : null}
+                {item.executionMode ? (
+                  <span className="px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/10 text-[9px] font-black uppercase tracking-[0.2em] text-blue-200">
+                    {item.executionMode}
+                  </span>
+                ) : null}
+                {item.sourceOfTruth ? (
+                  <span className="px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-[9px] font-black uppercase tracking-[0.2em] text-emerald-200">
+                    Source: {item.sourceOfTruth}
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="rounded-2xl border border-white/5 bg-black/30 p-4">
