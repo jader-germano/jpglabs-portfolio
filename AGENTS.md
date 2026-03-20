@@ -61,3 +61,5 @@ Each relevant entry should include:
 - Do not create parallel logs in other folders unless explicitly requested.
 - Keep public-facing wording professional and implementation-focused.
 - If publication did not actually happen, record it as `draft` or `planned`, never as deployed.
+- For any meaningful UI or layout change, prepare a Figma-first screen proposal and get validation before shipping implementation changes.
+- Do not collapse or remove major public-home sections without explicit approval from Jader after the screen proposal step.

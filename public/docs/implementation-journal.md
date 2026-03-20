@@ -87,3 +87,30 @@ Reorganizing roadmap between portfolio frontend and Next backend, adding Supabas
 - ?? public/docs/latest-release-notes.md
 - ?? public/docs/project-publication-log.md
 - ?? scripts/
+
+
+---
+
+## Restore portfolio home and add Figma-first guardrail
+- Timestamp: 2026-03-15T16:30:57.711Z
+- Status: in-progress
+- Repository: https://github.com/jader-germano/jpglabs-portfolio.git
+- Git user: jader.germano
+- Git email: jader.germano@tse.jus.br
+- Branch: main
+- Commit: 23988ed
+### Summary
+Restore the richer public homepage model after the restart cut and codify Figma-first approval before future UI changes.
+### Worktree Snapshot
+- M docker-compose.yml
+-  M index.html
+-  M package.json
+-  M src/App.tsx
+-  M src/components/Layout.tsx
+-  M src/context/AuthContext.tsx
+-  M src/data/roadmap.ts
+-  M src/pages/Hub.tsx
+-  M src/pages/Offer.tsx
+-  M src/pages/Portfolio.tsx
+- ?? .github/workflows/
+- ?? src/pages/PublicHome.tsx

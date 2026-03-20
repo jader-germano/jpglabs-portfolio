@@ -1,8 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, Bot, Layers, ShieldCheck, Wrench } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '../config/routes';
+import { ArrowUpRight, Bot, Layers, ShieldCheck, Wrench, MessageCircle, Send } from 'lucide-react';
 
 const CONTRACTOR_SERVICES = [
   {
@@ -40,34 +38,47 @@ const CONTRACTOR_SERVICES = [
 ];
 
 const Services: React.FC = () => {
+  useEffect(() => {
+    // Inject WhatsApp Widget
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.async = true;
+    script.src = 'https://w.app/widget-v1/5r60e9.js';
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
+
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-14">
+    <div className="max-w-7xl mx-auto px-6 py-12 selection:bg-blue-500/30">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-20">
         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500">Public Services</span>
-        <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter mt-4">
-          Company <span className="text-gray-600 italic">Offerings</span>
+        <h1 className="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter mt-4 leading-[0.85]">
+          Company <br /><span className="text-gray-600 italic">Offerings</span>
         </h1>
-        <p className="text-gray-500 text-sm mt-4 max-w-3xl leading-relaxed">
-          Service packages designed for contractors and technical teams that need reliable AI operations,
-          resilient infrastructure and senior implementation support.
+        <p className="text-gray-500 text-lg mt-8 max-w-2xl leading-relaxed">
+          Pacotes de serviço desenhados para empresas e times técnicos que exigem operações de IA resilientes e arquitetura de alta performance.
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-24">
         {CONTRACTOR_SERVICES.map((service) => (
           <motion.article
             key={service.id}
             whileHover={{ y: -4 }}
-            className="rounded-[32px] border border-white/5 bg-[#111214]/50 p-8 backdrop-blur-sm"
+            className="rounded-[40px] border border-white/5 bg-[#111214]/80 p-10 backdrop-blur-sm group hover:border-blue-500/30 transition-all"
           >
-            <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-500 mb-6">
-              <service.icon size={22} />
+            <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-500 mb-8 group-hover:bg-blue-500 group-hover:text-white transition-all">
+              <service.icon size={28} />
             </div>
-            <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-4">{service.title}</h2>
-            <p className="text-gray-500 text-sm leading-relaxed mb-6">{service.description}</p>
-            <ul className="space-y-2">
+            <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-6">{service.title}</h2>
+            <p className="text-gray-400 text-sm leading-relaxed mb-8">{service.description}</p>
+            <ul className="grid grid-cols-1 gap-3">
               {service.bullets.map((bullet) => (
-                <li key={bullet} className="text-[11px] text-gray-400 uppercase tracking-widest font-bold">
+                <li key={bullet} className="flex items-center gap-3 text-[10px] text-gray-500 uppercase tracking-widest font-black">
+                  <div className="h-1 w-1 rounded-full bg-blue-500/50" />
                   {bullet}
                 </li>
               ))}
@@ -76,26 +87,45 @@ const Services: React.FC = () => {
         ))}
       </div>
 
-      <div className="rounded-3xl border border-white/5 bg-black/30 p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div>
-          <h3 className="text-xl font-black text-white uppercase tracking-tight">Need a tailored engagement?</h3>
-          <p className="text-gray-500 text-sm mt-2">Start with the offer page or review portfolio case studies.</p>
+      <section className="grid lg:grid-cols-[1fr_1.2fr] gap-12 bg-[#101215] border border-white/5 rounded-[48px] overflow-hidden mb-24 shadow-2xl">
+        <div className="p-12 md:p-16 flex flex-col justify-center">
+          <div className="h-16 w-16 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500 mb-10">
+            <MessageCircle size={32} />
+          </div>
+          <h2 className="text-4xl font-black uppercase tracking-tighter text-white mb-6">Inquire Services</h2>
+          <p className="text-gray-400 leading-relaxed mb-10">
+            Tem um projeto desafiador ou precisa de uma auditoria técnica? Entre em contato para discutirmos a melhor solução arquitetural para o seu negócio.
+          </p>
+          <div className="flex flex-col gap-4">
+            <a href="https://wa.me/5511999999999" className="flex items-center justify-between bg-[#25D366] text-black px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all">
+              WhatsApp Profissional <ArrowUpRight size={18} />
+            </a>
+          </div>
         </div>
-        <div className="flex gap-3">
-          <Link
-            to={ROUTES.offer}
-            className="px-6 py-3 rounded-xl bg-white text-black text-[10px] font-black uppercase tracking-[0.2em] hover:bg-gray-200 transition-all"
-          >
-            Open Offer
-          </Link>
-          <Link
-            to={ROUTES.portfolioCanonical}
-            className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/10 transition-all inline-flex items-center gap-2"
-          >
-            View Portfolio <ArrowUpRight size={14} />
-          </Link>
+        
+        <div className="bg-white/5 p-12 md:p-16 border-l border-white/5">
+          <form className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest ml-1">Nome</label>
+                <input type="text" className="w-full bg-black/40 border border-white/5 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-blue-500/50 transition-all" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest ml-1">E-mail</label>
+                <input type="email" className="w-full bg-black/40 border border-white/5 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-blue-500/50 transition-all" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest ml-1">Mensagem</label>
+              <textarea rows={4} className="w-full bg-black/40 border border-white/5 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-blue-500/50 transition-all resize-none" />
+            </div>
+            <button type="submit" className="w-full bg-white text-black font-black uppercase tracking-[0.2em] py-5 rounded-2xl hover:bg-gray-200 transition-all flex items-center justify-center gap-3">
+              Enviar Proposta <Send size={16} />
+            </button>
+            <p className="text-[9px] text-gray-600 text-center uppercase tracking-widest">Ao enviar, você concorda com o tratamento de dados conforme nossa LGPD.</p>
+          </form>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
