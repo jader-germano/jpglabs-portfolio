@@ -9,7 +9,14 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isPrimeOwner: boolean;
   isAdmin: boolean;
+  isSubOwner: boolean;
+  isFamily: boolean;
+  isPiAgent: boolean;
+  isClaudeOrchestrator: boolean;
   isConsultant: boolean;
+  // Capability shortcuts
+  canMutate: boolean;     // PRIME_OWNER only
+  canViewDashboard: boolean; // PRIME_OWNER | SUB_OWNER | FAMILY | agents
   sessionTimeRemaining: number;
   showSessionWarning: boolean;
   extendSession: () => void;
@@ -31,6 +38,9 @@ async function sha256(value: string): Promise<string> {
     .join('');
 }
 
+// ── Mock users — temporary until Supabase Auth is fully wired ──────────────
+// Passwords hashed with SHA-256. Roles mirror portal_users in Supabase.
+// Add daughters here when they need access (use sha256(password) via DevTools).
 const MOCK_USERS: Array<User & { passwordHash: string }> = [
   {
     id: '1',
@@ -38,6 +48,29 @@ const MOCK_USERS: Array<User & { passwordHash: string }> = [
     passwordHash: 'd3438446d908a65ee9cade2a99dc56907915419e1cf579d526577920e8a12046',
     name: 'Jader Germano',
     role: 'PRIME_OWNER',
+  },
+  {
+    id: '3',
+    email: 'ayumi@jpglabs.com.br',
+    passwordHash: '4099d061083a20cc98c3dece259332f370193740d7d28a1b893397fd814aa640',
+    name: 'Ayumi Germano',
+    role: 'SUB_OWNER',
+  },
+  // FAMILY role — daughters: add email + sha256(password) when ready
+  // { id: '4', email: 'daughter1@jpglabs.com.br', passwordHash: 'HASH', name: 'Name', role: 'FAMILY' },
+  {
+    id: '5',
+    email: 'pi@jpglabs.com.br',
+    passwordHash: 'e86a93896595a7b07287d5dd0a2d67621d61dfb1a35b10dadf4c1e24ab077c48', // PI_API_KEY as password
+    name: 'Pi Agent',
+    role: 'PI_AGENT',
+  },
+  {
+    id: '6',
+    email: 'claw@jpglabs.com.br',
+    passwordHash: 'e86a93896595a7b07287d5dd0a2d67621d61dfb1a35b10dadf4c1e24ab077c48',
+    name: 'Claude Orchestrator',
+    role: 'CLAUDE_ORCHESTRATOR',
   },
   {
     id: '2',
@@ -123,7 +156,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isAuthenticated = user !== null;
   const isPrimeOwner = user?.role === 'PRIME_OWNER';
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'PRIME_OWNER';
+  const isSubOwner = user?.role === 'SUB_OWNER';
+  const isFamily = user?.role === 'FAMILY';
+  const isPiAgent = user?.role === 'PI_AGENT';
+  const isClaudeOrchestrator = user?.role === 'CLAUDE_ORCHESTRATOR';
   const isConsultant = user?.role === 'USER_CONSULTANT';
+  const canMutate = isPrimeOwner;
+  const canViewDashboard = isPrimeOwner || isSubOwner || isFamily || isPiAgent || isClaudeOrchestrator || isAdmin;
 
   return (
     <AuthContext.Provider
@@ -134,7 +173,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated,
         isPrimeOwner,
         isAdmin,
+        isSubOwner,
+        isFamily,
+        isPiAgent,
+        isClaudeOrchestrator,
         isConsultant,
+        canMutate,
+        canViewDashboard,
         sessionTimeRemaining,
         showSessionWarning,
         extendSession,

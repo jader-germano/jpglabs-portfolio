@@ -6,6 +6,8 @@ import {
   LayoutGrid,
   BadgeDollarSign,
   Mic,
+  FileText,
+  ShieldCheck,
   Github,
   Linkedin,
   LogOut,
@@ -17,15 +19,37 @@ import { useAuth } from '../context/AuthContext';
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, isPrimeOwner, logout } = useAuth();
+  const { user, isAuthenticated, isPrimeOwner, isSubOwner, isFamily, isClaudeOrchestrator, isPiAgent, logout } = useAuth();
 
-  const navItems = [
-    { label: 'Home', path: ROUTES.root, icon: LayoutGrid },
-    { label: 'Offer', path: ROUTES.offer, icon: BadgeDollarSign },
-    { label: 'Services', path: ROUTES.services, icon: Briefcase },
-    { label: 'Products', path: ROUTES.downloads, icon: Download },
-    { label: 'Portfolio', path: ROUTES.portfolioCanonical, icon: LayoutGrid },
+  const isCommercialUser = isPrimeOwner || isSubOwner || user?.role === 'ADMIN' || user?.role === 'USER_CONSULTANT';
+  const isOwner = isPrimeOwner || isSubOwner;
+  const isAgent = isClaudeOrchestrator || isPiAgent;
+
+  const navItems = isAuthenticated
+    ? [
+        { label: 'Portfolio', path: ROUTES.portfolioCanonical, icon: LayoutGrid },
+        { label: 'Hub', path: ROUTES.hub, icon: ShieldCheck },
+        ...(isCommercialUser ? [
+          { label: 'Offer', path: ROUTES.offer, icon: BadgeDollarSign },
+          { label: 'Services', path: ROUTES.services, icon: Briefcase },
+          { label: 'Products', path: ROUTES.downloads, icon: Download },
+          { label: 'Docs', path: ROUTES.docs, icon: FileText },
+        ] : []),
+      ]
+    : [{ label: 'Portfolio', path: ROUTES.portfolioCanonical, icon: LayoutGrid }];
+
+  const ownerQuickLinks = [
+    ...(isOwner || isAgent ? [{ label: 'Portfolio Manager', path: ROUTES.portfolioManager }] : []),
+    ...(isCommercialUser ? [{ label: 'Pi Guardrails', path: ROUTES.docs }] : []),
+    { label: 'Termos & LGPD', path: ROUTES.legal },
   ];
+
+  const roleLabel = isPrimeOwner ? 'PRIME OWNER'
+    : isSubOwner ? 'SUB OWNER'
+    : isFamily ? 'FAMÍLIA'
+    : isClaudeOrchestrator ? 'CLAW'
+    : isPiAgent ? 'PI AGENT'
+    : user?.role ?? 'USER';
 
   const isItemActive = (path: string): boolean => {
     if (path === ROUTES.portfolioCanonical) {
@@ -82,7 +106,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     {user?.name?.split(' ')[0]}
                   </span>
                   <span className="text-[7px] font-bold uppercase text-blue-400 tracking-widest">
-                    {isPrimeOwner ? 'PRIME OWNER' : user?.role}
+                    {roleLabel}
                   </span>
                 </div>
                 <button
@@ -110,6 +134,25 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </a>
           </div>
         </div>
+        {isAuthenticated && (
+          <div className="hidden xl:flex max-w-7xl mx-auto px-6 py-2 justify-between">
+            <div className="flex items-center gap-6">
+              {ownerQuickLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500 hover:text-white transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.4em] text-gray-500">
+              <ShieldCheck size={12} className="text-blue-400" />
+              Pi guardrails enforced
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Floating Side Navigation (Socials + Quick Actions) */}
@@ -150,7 +193,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="flex justify-center gap-12 mb-10">
             <Link to={ROUTES.legal} className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">Termos de Uso</Link>
             <Link to={ROUTES.legal} className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">Política de Privacidade</Link>
-            <a href="mailto:jader@jpglabs.com.br" className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">Contato</a>
+            <a href="mailto:contato@jpglabs.com.br" className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-colors">Contato</a>
           </div>
 
           <p className="text-gray-700 text-[9px] uppercase tracking-[0.5em] font-black">
