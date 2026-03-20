@@ -1,4 +1,4 @@
-export type Role = 'PRIME_OWNER' | 'ADMIN' | 'USER_CONSULTANT' | 'USER' | 'PUBLIC';
+export type Role = 'ROOT_ADMIN' | 'ADMIN' | 'USER_CONSULTANT' | 'USER' | 'PUBLIC';
 
 export interface User {
   id: string;

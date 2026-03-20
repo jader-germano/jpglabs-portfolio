@@ -17,10 +17,10 @@ function resolveRoleFromProfile(
   profileRole: string | null | undefined,
   email: string | null | undefined,
 ): User['role'] {
-  if (email && OWNER_EMAILS.includes(email.toLowerCase())) return 'PRIME_OWNER';
+  if (email && OWNER_EMAILS.includes(email.toLowerCase())) return 'ROOT_ADMIN';
   if (!profileRole) return 'USER';
   const map: Record<string, User['role']> = {
-    PRIME_OWNER: 'PRIME_OWNER',
+    ROOT_ADMIN: 'ROOT_ADMIN',
     SUB_OWNER: 'SUB_OWNER',
     FAMILY: 'FAMILY',
     PI_AGENT: 'PI_AGENT',
@@ -41,14 +41,14 @@ interface AuthContextType {
   loginWithOAuth: (provider: 'github' | 'google' | 'apple') => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
-  isPrimeOwner: boolean;
+  isRootAdmin: boolean;
   isAdmin: boolean;
   isSubOwner: boolean;
   isFamily: boolean;
   isPiAgent: boolean;
   isClaudeOrchestrator: boolean;
   isConsultant: boolean;
-  isPending: boolean;         // OAuth user awaiting PRIME_OWNER approval
+  isPending: boolean;         // OAuth user awaiting ROOT_ADMIN approval
   canMutate: boolean;
   canViewDashboard: boolean;
   sessionTimeRemaining: number;
@@ -64,13 +64,13 @@ async function loadUserFromSession(session: Session): Promise<User> {
   const sbUser = session.user;
   const email = sbUser.email ?? '';
 
-  // Fast-path: PRIME_OWNER never needs a profile row
+  // Fast-path: ROOT_ADMIN never needs a profile row
   if (OWNER_EMAILS.includes(email.toLowerCase())) {
     return {
       id: sbUser.id,
       email,
       name: sbUser.user_metadata?.full_name ?? sbUser.user_metadata?.name ?? 'Jader Germano',
-      role: 'PRIME_OWNER',
+      role: 'ROOT_ADMIN',
     };
   }
 
@@ -200,16 +200,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ── Derived booleans ──────────────────────────────────────────────────────
   const isAuthenticated = user !== null && !isPending;
-  const isPrimeOwner = user?.role === 'PRIME_OWNER';
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'PRIME_OWNER';
+  const isRootAdmin = user?.role === 'ROOT_ADMIN';
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'ROOT_ADMIN';
   const isSubOwner = user?.role === 'SUB_OWNER';
   const isFamily = user?.role === 'FAMILY';
   const isPiAgent = user?.role === 'PI_AGENT';
   const isClaudeOrchestrator = user?.role === 'CLAUDE_ORCHESTRATOR';
   const isConsultant = user?.role === 'USER_CONSULTANT';
-  const canMutate = isPrimeOwner;
+  const canMutate = isRootAdmin;
   const canViewDashboard =
-    isPrimeOwner || isSubOwner || isFamily || isPiAgent || isClaudeOrchestrator || isAdmin;
+    isRootAdmin || isSubOwner || isFamily || isPiAgent || isClaudeOrchestrator || isAdmin;
 
   return (
     <AuthContext.Provider
@@ -219,7 +219,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithOAuth,
         logout,
         isAuthenticated,
-        isPrimeOwner,
+        isRootAdmin,
         isAdmin,
         isSubOwner,
         isFamily,
