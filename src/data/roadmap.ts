@@ -112,7 +112,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
       'Treat the Next application as the first backend/BFF lane, carry forward the newly shipped runtime/auth/legal work, and harden it for hundreds or thousands of business users before adding the future Java replica.',
     deliverables: [
       '✅ Replace dashboard mock data with a private Pi runtime proxy on the Next backend lane',
-      '✅ Add owner-role fallback so jader@jpglabs.com.br resolves to PRIME_OWNER',
+      '✅ Add owner-role fallback so jader@jpglabs.com.br resolves to ROOT_ADMIN',
       '✅ Add login wordmark plus expanded legal/privacy copy',
       'Keep auth, session, audit and protected APIs stateless and externally backed',
       'Define async boundaries, rate limiting, retries and observability for bursty workloads',

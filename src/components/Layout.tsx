@@ -17,7 +17,7 @@ import { useAuth } from '../context/AuthContext';
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, isPrimeOwner, logout } = useAuth();
+  const { user, isAuthenticated, isRootAdmin, logout } = useAuth();
 
   const navItems = [
     { label: 'Home', path: ROUTES.root, icon: LayoutGrid },
@@ -82,7 +82,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     {user?.name?.split(' ')[0]}
                   </span>
                   <span className="text-[7px] font-bold uppercase text-blue-400 tracking-widest">
-                    {isPrimeOwner ? 'PRIME OWNER' : user?.role}
+                    {isRootAdmin ? 'ROOT ADMIN' : user?.role}
                   </span>
                 </div>
                 <button

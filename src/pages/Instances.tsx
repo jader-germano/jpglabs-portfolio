@@ -19,7 +19,7 @@ type VpsTelemetry = {
 };
 
 const Instances: React.FC = () => {
-  const { isPrimeOwner } = useAuth();
+  const { isRootAdmin } = useAuth();
   const [telemetry, setTelemetry] = useState<VpsTelemetry | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -167,7 +167,7 @@ const Instances: React.FC = () => {
                       <p className="text-[9px] text-gray-600 uppercase tracking-widest font-black mb-1">Age</p>
                       <p className="text-xs text-white font-bold">{pod.age}</p>
                     </div>
-                    {isPrimeOwner && (
+                    {isRootAdmin && (
                       <button className="px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-white transition-all opacity-0 group-hover:opacity-100">
                         View Logs
                       </button>
