@@ -8,19 +8,20 @@ import type { User } from '../types';
 const SESSION_DURATION_MS = 5 * 60 * 1000; // 5-minute activity window
 const WARNING_THRESHOLD_MS = 10 * 1000;    // show warning 10s before expiry
 const PI_HANDOFF_KEY = 'jpglabs_pi_handoff_token';
-const BACKEND_BASE = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000';
+const PORTFOLIO_API_BASE = import.meta.env.VITE_PORTFOLIO_API_URL ?? 'http://localhost:8787';
+const AI_FRONTEND_BASE = import.meta.env.VITE_AI_FRONTEND_URL ?? 'http://localhost:3000';
 
 // ── Role helpers ──────────────────────────────────────────────────────────────
-const OWNER_EMAILS = ['jader@jpglabs.com.br', 'jader.germano@icloud.com'];
+const ROOT_ADMIN_EMAIL_ALIASES = ['jader@jpglabs.com.br', 'jader@jpglabs', 'jader.germano@icloud.com'];
 
 function resolveRoleFromProfile(
   profileRole: string | null | undefined,
   email: string | null | undefined,
 ): User['role'] {
-  if (email && OWNER_EMAILS.includes(email.toLowerCase())) return 'PRIME_OWNER';
+  if (email && ROOT_ADMIN_EMAIL_ALIASES.includes(email.toLowerCase())) return 'ROOT_ADMIN';
   if (!profileRole) return 'USER';
   const map: Record<string, User['role']> = {
-    PRIME_OWNER: 'PRIME_OWNER',
+    ROOT_ADMIN: 'ROOT_ADMIN',
     SUB_OWNER: 'SUB_OWNER',
     FAMILY: 'FAMILY',
     PI_AGENT: 'PI_AGENT',
@@ -41,14 +42,14 @@ interface AuthContextType {
   loginWithOAuth: (provider: 'github' | 'google' | 'apple') => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
-  isPrimeOwner: boolean;
+  isRootAdmin: boolean;
   isAdmin: boolean;
   isSubOwner: boolean;
   isFamily: boolean;
   isPiAgent: boolean;
   isClaudeOrchestrator: boolean;
   isConsultant: boolean;
-  isPending: boolean;         // OAuth user awaiting PRIME_OWNER approval
+  isPending: boolean;         // OAuth user awaiting ROOT_ADMIN approval
   canMutate: boolean;
   canViewDashboard: boolean;
   sessionTimeRemaining: number;
@@ -64,13 +65,13 @@ async function loadUserFromSession(session: Session): Promise<User> {
   const sbUser = session.user;
   const email = sbUser.email ?? '';
 
-  // Fast-path: PRIME_OWNER never needs a profile row
-  if (OWNER_EMAILS.includes(email.toLowerCase())) {
+  // Fast-path: ROOT_ADMIN never needs a profile row
+  if (ROOT_ADMIN_EMAIL_ALIASES.includes(email.toLowerCase())) {
     return {
       id: sbUser.id,
       email,
       name: sbUser.user_metadata?.full_name ?? sbUser.user_metadata?.name ?? 'Jader Germano',
-      role: 'PRIME_OWNER',
+      role: 'ROOT_ADMIN',
     };
   }
 
@@ -131,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ── OAuth login (GitHub / Google / Apple) ─────────────────────────────────
   const loginWithOAuth = async (provider: 'github' | 'google' | 'apple') => {
-    const redirectTo = `${BACKEND_BASE}/api/auth/callback/supabase`;
+    const redirectTo = `${AI_FRONTEND_BASE}/login`;
     await supabase.auth.signInWithOAuth({
       provider: provider as Provider,
       options: { redirectTo },
@@ -151,7 +152,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // USER with no profile = pending approval
             setIsPending(true);
             // Notify backend to create/confirm PENDING row
-            fetch(`${BACKEND_BASE}/api/auth/request-access`, {
+            fetch(`${PORTFOLIO_API_BASE}/api/auth/request-access`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: u.email, provider: 'oauth' }),
@@ -200,16 +201,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ── Derived booleans ──────────────────────────────────────────────────────
   const isAuthenticated = user !== null && !isPending;
-  const isPrimeOwner = user?.role === 'PRIME_OWNER';
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'PRIME_OWNER';
+  const isRootAdmin = user?.role === 'ROOT_ADMIN';
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'ROOT_ADMIN';
   const isSubOwner = user?.role === 'SUB_OWNER';
   const isFamily = user?.role === 'FAMILY';
   const isPiAgent = user?.role === 'PI_AGENT';
   const isClaudeOrchestrator = user?.role === 'CLAUDE_ORCHESTRATOR';
   const isConsultant = user?.role === 'USER_CONSULTANT';
-  const canMutate = isPrimeOwner;
+  const canMutate = isRootAdmin;
   const canViewDashboard =
-    isPrimeOwner || isSubOwner || isFamily || isPiAgent || isClaudeOrchestrator || isAdmin;
+    isRootAdmin || isSubOwner || isFamily || isPiAgent || isClaudeOrchestrator || isAdmin;
 
   return (
     <AuthContext.Provider
@@ -219,7 +220,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithOAuth,
         logout,
         isAuthenticated,
-        isPrimeOwner,
+        isRootAdmin,
         isAdmin,
         isSubOwner,
         isFamily,
