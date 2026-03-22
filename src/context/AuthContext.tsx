@@ -8,16 +8,17 @@ import type { User } from '../types';
 const SESSION_DURATION_MS = 5 * 60 * 1000; // 5-minute activity window
 const WARNING_THRESHOLD_MS = 10 * 1000;    // show warning 10s before expiry
 const PI_HANDOFF_KEY = 'jpglabs_pi_handoff_token';
-const BACKEND_BASE = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000';
+const PORTFOLIO_API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+const AI_FRONTEND_BASE = import.meta.env.VITE_PI_SERVICE_URL ?? 'http://localhost:3131';
 
 // ── Role helpers ──────────────────────────────────────────────────────────────
-const OWNER_EMAILS = ['jader@jpglabs.com.br', 'jader.germano@icloud.com'];
+const ROOT_ADMIN_EMAIL_ALIASES = ['jader@jpglabs.com.br', 'jader@jpglabs', 'jader.germano@icloud.com'];
 
 function resolveRoleFromProfile(
   profileRole: string | null | undefined,
   email: string | null | undefined,
 ): User['role'] {
-  if (email && OWNER_EMAILS.includes(email.toLowerCase())) return 'ROOT_ADMIN';
+  if (email && ROOT_ADMIN_EMAIL_ALIASES.includes(email.toLowerCase())) return 'ROOT_ADMIN';
   if (!profileRole) return 'USER';
   const map: Record<string, User['role']> = {
     ROOT_ADMIN: 'ROOT_ADMIN',
@@ -65,7 +66,7 @@ async function loadUserFromSession(session: Session): Promise<User> {
   const email = sbUser.email ?? '';
 
   // Fast-path: ROOT_ADMIN never needs a profile row
-  if (OWNER_EMAILS.includes(email.toLowerCase())) {
+  if (ROOT_ADMIN_EMAIL_ALIASES.includes(email.toLowerCase())) {
     return {
       id: sbUser.id,
       email,
@@ -131,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ── OAuth login (GitHub / Google / Apple) ─────────────────────────────────
   const loginWithOAuth = async (provider: 'github' | 'google' | 'apple') => {
-    const redirectTo = `${BACKEND_BASE}/api/auth/callback/supabase`;
+    const redirectTo = `${AI_FRONTEND_BASE}/login`;
     await supabase.auth.signInWithOAuth({
       provider: provider as Provider,
       options: { redirectTo },
@@ -151,7 +152,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // USER with no profile = pending approval
             setIsPending(true);
             // Notify backend to create/confirm PENDING row
-            fetch(`${BACKEND_BASE}/api/auth/request-access`, {
+            fetch(`${PORTFOLIO_API_BASE}/api/auth/request-access`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: u.email, provider: 'oauth' }),

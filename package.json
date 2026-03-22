@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:stage": "tsc -b && vite build --mode staging",
+    "build:prod": "tsc -b && vite build --mode production",
     "lint": "eslint .",
     "preview": "vite preview",
+    "preview:stage": "vite preview --mode staging",
     "docs:session": "node scripts/project-docs-sync.mjs --mode start",
     "docs:publish": "node scripts/project-docs-sync.mjs --mode publish",
     "docs:release-notes": "node scripts/generate-release-notes.mjs"

@@ -14,9 +14,11 @@ import PortfolioPage from './pages/Portfolio';
 import ProductDetailPage from './pages/ProductDetail';
 import PublicHomePage from './pages/PublicHome';
 import ServicesPage from './pages/Services';
-import LoginPage from './pages/Login';
 import DocsPage from './pages/Docs';
-import PortfolioManagerPage from './pages/PortfolioManager';
+
+const normalizeBasePath = (value: string): string => value.replace(/\/+$/, '');
+const AI_FRONTEND_BASE = normalizeBasePath(import.meta.env.VITE_PI_SERVICE_URL ?? '/pi');
+const toAiFrontend = (pathname = ''): string => `${AI_FRONTEND_BASE}${pathname}`;
 
 function ExternalRedirect({ to }: { to: string }) {
   useEffect(() => {
@@ -35,22 +37,22 @@ function AppRoutes() {
         <Layout>
           <Routes>
             <Route path={ROUTES.root} element={<PublicHomePage />} />
-            <Route path={ROUTES.login} element={<LoginPage />} />
+            <Route path={ROUTES.login} element={<ExternalRedirect to={toAiFrontend('/login')} />} />
             <Route path={ROUTES.offer} element={<OfferPage />} />
             <Route path={ROUTES.services} element={<ServicesPage />} />
             <Route path={ROUTES.downloads} element={<DownloadsPage />} />
             <Route path={ROUTES.docs} element={<DocsPage />} />
-            <Route path={ROUTES.portfolioManager} element={<PortfolioManagerPage />} />
+            <Route path={ROUTES.portfolioManager} element={<ExternalRedirect to={toAiFrontend('/dashboard/assistant')} />} />
             <Route path={ROUTES.portfolioCanonical} element={<PortfolioPage />} />
             <Route path={ROUTES.portfolioDynamic} element={<PortfolioPage />} />
             <Route path={ROUTES.caseStudy} element={<CaseStudyPage />} />
             <Route path={ROUTES.legal} element={<LegalPage />} />
 
             <Route path={ROUTES.portfolioLegacy} element={<Navigate to={ROUTES.portfolioCanonical} replace />} />
-            <Route path={ROUTES.hubLegacy} element={<ExternalRedirect to="/pi" />} />
+            <Route path={ROUTES.hubLegacy} element={<ExternalRedirect to={toAiFrontend()} />} />
             <Route path={ROUTES.assetsLegacy} element={<Navigate to={ROUTES.downloads} replace />} />
-            <Route path={ROUTES.guardianLegacy} element={<ExternalRedirect to="/pi" />} />
-            <Route path={ROUTES.home} element={<ExternalRedirect to="/pi" />} />
+            <Route path={ROUTES.guardianLegacy} element={<ExternalRedirect to={toAiFrontend('/dashboard/guardian')} />} />
+            <Route path={ROUTES.home} element={<ExternalRedirect to={toAiFrontend()} />} />
 
             {PRODUCT_CATALOG.map((product) => (
               <Route
@@ -60,11 +62,11 @@ function AppRoutes() {
               />
             ))}
 
-            <Route path={ROUTES.dashboardInstances} element={<ExternalRedirect to="/pi" />} />
-            <Route path={`${ROUTES.dashboardInstances}/:serviceSlug`} element={<ExternalRedirect to="/pi" />} />
-            <Route path={ROUTES.overview} element={<ExternalRedirect to="/pi" />} />
-            <Route path={ROUTES.guardian} element={<ExternalRedirect to="/pi" />} />
-            <Route path={ROUTES.upsell} element={<ExternalRedirect to="/pi" />} />
+            <Route path={ROUTES.dashboardInstances} element={<ExternalRedirect to={toAiFrontend('/dashboard/instances')} />} />
+            <Route path={`${ROUTES.dashboardInstances}/:serviceSlug`} element={<ExternalRedirect to={toAiFrontend('/dashboard/instances')} />} />
+            <Route path={ROUTES.overview} element={<ExternalRedirect to={toAiFrontend('/dashboard/assistant')} />} />
+            <Route path={ROUTES.guardian} element={<ExternalRedirect to={toAiFrontend('/dashboard/guardian')} />} />
+            <Route path={ROUTES.upsell} element={<ExternalRedirect to={toAiFrontend('/dashboard/assistant')} />} />
             <Route path="*" element={<Navigate to={ROUTES.root} replace />} />
           </Routes>
         </Layout>
