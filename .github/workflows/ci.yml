@@ -2,8 +2,18 @@ name: Validate Portfolio Frontend
 
 on:
   pull_request:
+    branches:
+      - develop
+      - release
+      - stage
+      - master
+      - main
   push:
-    branches-ignore:
+    branches:
+      - develop
+      - release
+      - stage
+      - master
       - main
   workflow_dispatch:
 
@@ -15,9 +25,60 @@ permissions:
   contents: read
 
 jobs:
+  pr-governance:
+    name: PR governance gate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Validate lane flow and triad evidence
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const rawBase = pr.base.ref;
+            const rawHead = pr.head.ref;
+            const body = pr.body || "";
+            const canonical = (ref) => {
+              if (ref === "main") return "master";
+              if (ref === "stage") return "release";
+              return ref;
+            };
+            const base = canonical(rawBase);
+            const head = canonical(rawHead);
+            const requiredSections = [
+              "## Triad Verdict",
+              "## Risks",
+              "## Rollback",
+            ];
+            const missing = requiredSections.filter((section) => !body.includes(section));
+
+            if (missing.length) {
+              core.setFailed(`Missing required PR sections: ${missing.join(", ")}`);
+            }
+
+            if (!/brutal-critic-triad|Triad executada|Verdict:\s*(PASS|CONDITIONAL)/i.test(body)) {
+              core.setFailed("PR body must show that the triad ran and recorded a verdict.");
+            }
+
+            if (base === "release" && head !== "develop") {
+              core.setFailed(`PRs into release must come from develop. Received ${rawHead} -> ${rawBase}.`);
+            }
+
+            if (base === "master" && head !== "release") {
+              core.setFailed(`PRs into master must come from release. Received ${rawHead} -> ${rawBase}.`);
+            }
+
+            await core.summary
+              .addHeading("Promotion lane")
+              .addRaw(`head: \`${rawHead}\` (canonical: \`${head}\`) -> base: \`${rawBase}\` (canonical: \`${base}\`)`)
+              .write();
+
   validate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    needs: [pr-governance]
+    if: always() && (needs.pr-governance.result == 'success' || needs.pr-governance.result == 'skipped')
 
     steps:
       - name: Checkout repository
@@ -37,4 +98,11 @@ jobs:
         run: npm run lint
 
       - name: Build
-        run: npm run build
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "master" ] || [ "${GITHUB_BASE_REF}" = "master" ] || [ "${GITHUB_BASE_REF}" = "main" ]; then
+            npm run build:prod
+          elif [ "${GITHUB_REF_NAME}" = "release" ] || [ "${GITHUB_REF_NAME}" = "stage" ] || [ "${GITHUB_BASE_REF}" = "release" ] || [ "${GITHUB_BASE_REF}" = "stage" ]; then
+            npm run build:stage
+          else
+            npm run build
+          fi

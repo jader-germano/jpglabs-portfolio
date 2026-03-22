@@ -3,6 +3,18 @@
 - What changed:
 - Why this change exists:
 
+## Target Lane
+
+- [ ] develop
+- [ ] release
+- [ ] master
+
+## Triad Verdict
+
+- [ ] `brutal-critic-triad` executed on the final diff
+- Verdict: PASS | CONDITIONAL | FAIL
+- Summary:
+
 ## Scope
 
 - Epic or issue:
@@ -21,12 +33,11 @@
 - Manual checks:
 - Known risks:
 
+## Rollback
+
+- Previous known-good ref:
+- Rollback command or workflow:
+
 ## Visual References
 
 - Attached screenshots or linked references:
-
-## Deployment Notes
-
-- Requires deploy changes:
-- Requires docs publish:
-- Rollback note:
