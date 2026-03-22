@@ -17,7 +17,7 @@ import ServicesPage from './pages/Services';
 import DocsPage from './pages/Docs';
 
 const normalizeBasePath = (value: string): string => value.replace(/\/+$/, '');
-const AI_FRONTEND_BASE = normalizeBasePath(import.meta.env.VITE_AI_FRONTEND_URL ?? '/pi');
+const AI_FRONTEND_BASE = normalizeBasePath(import.meta.env.VITE_PI_SERVICE_URL ?? '/pi');
 const toAiFrontend = (pathname = ''): string => `${AI_FRONTEND_BASE}${pathname}`;
 
 function ExternalRedirect({ to }: { to: string }) {

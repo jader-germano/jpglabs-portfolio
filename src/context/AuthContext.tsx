@@ -8,8 +8,8 @@ import type { User } from '../types';
 const SESSION_DURATION_MS = 5 * 60 * 1000; // 5-minute activity window
 const WARNING_THRESHOLD_MS = 10 * 1000;    // show warning 10s before expiry
 const PI_HANDOFF_KEY = 'jpglabs_pi_handoff_token';
-const PORTFOLIO_API_BASE = import.meta.env.VITE_PORTFOLIO_API_URL ?? 'http://localhost:8787';
-const AI_FRONTEND_BASE = import.meta.env.VITE_AI_FRONTEND_URL ?? 'http://localhost:3000';
+const PORTFOLIO_API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+const AI_FRONTEND_BASE = import.meta.env.VITE_PI_SERVICE_URL ?? 'http://localhost:3131';
 
 // ── Role helpers ──────────────────────────────────────────────────────────────
 const ROOT_ADMIN_EMAIL_ALIASES = ['jader@jpglabs.com.br', 'jader@jpglabs', 'jader.germano@icloud.com'];
