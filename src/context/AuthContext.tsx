@@ -9,7 +9,8 @@ const SESSION_DURATION_MS = 5 * 60 * 1000; // 5-minute activity window
 const WARNING_THRESHOLD_MS = 10 * 1000;    // show warning 10s before expiry
 const PI_HANDOFF_KEY = 'jpglabs_pi_handoff_token';
 const PORTFOLIO_API_BASE = import.meta.env.VITE_PORTFOLIO_API_URL ?? 'http://localhost:8787';
-const AI_FRONTEND_BASE = import.meta.env.VITE_AI_FRONTEND_URL ?? 'http://localhost:3000';
+// (kept for legacy handoff use; no longer referenced after OAuth callback migration)
+// const AI_FRONTEND_BASE = import.meta.env.VITE_AI_FRONTEND_URL ?? 'http://localhost:3000';
 
 // ── Role helpers ──────────────────────────────────────────────────────────────
 const ROOT_ADMIN_EMAIL_ALIASES = ['jader@jpglabs.com.br', 'jader@jpglabs', 'jader.germano@icloud.com'];
@@ -132,12 +133,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ── OAuth login (GitHub / Google / Apple) ─────────────────────────────────
   const loginWithOAuth = async (provider: 'github' | 'google' | 'apple') => {
-    const redirectTo = `${AI_FRONTEND_BASE}/login`;
+    // Remember where the user came from so AuthCallback can return them home
+    try {
+      const current = window.location.pathname + window.location.search;
+      const returnTo = current === '/login' || current.startsWith('/auth/callback') ? '/' : current;
+      sessionStorage.setItem('oauth_return_to', returnTo);
+    } catch { /* sessionStorage disabled — ignore */ }
+    const redirectTo = `${window.location.origin}/auth/callback`;
     await supabase.auth.signInWithOAuth({
       provider: provider as Provider,
       options: { redirectTo },
     });
-    // Redirect happens; onAuthStateChange picks up session on return
+    // Browser redirects to provider; onAuthStateChange picks up session on callback
   };
 
 

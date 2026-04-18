@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D8 · Mobile Drawer Variants — Shared Auth Realm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Sincronizado com openclaude-hub · Claude brand palette */
+    --bg: #0d0d0d;
+    --bg-elev-1: #171717;
+    --bg-elev-2: #222222;
+    --bg-elev-3: #2c2c2c;
+    --text: #f0f0f0;
+    --text-dim: #999999;
+    --text-faint: #505050;
+    --accent: #c04a3f;                 /* Red-pulled · rgb(192, 74, 63) · não compete com Claude */
+    --accent-soft: rgba(192, 74, 63, 0.14);
+    --accent-deep: rgba(192, 74, 63, 0.32);
+    --accent-glow: rgba(192, 74, 63, 0.28);
+    --grid-line: rgba(192, 74, 63, 0.08);
+    --grid-major: rgba(192, 74, 63, 0.18);
+    --axis: rgba(192, 74, 63, 0.4);
+    --border: rgba(255, 255, 255, 0.06);
+    --border-strong: rgba(255, 255, 255, 0.1);
+    --good: #4eba65;
+    --bad: #ff6b80;
+  }
+
+  [data-theme="light"] {
+    --bg: #fafaf9;
+    --bg-elev-1: #f2f0ed;
+    --bg-elev-2: #e8e5e0;
+    --bg-elev-3: #dcd8d2;
+    --text: #171717;
+    --text-dim: #5a5550;
+    --text-faint: #928b82;
+    --border: rgba(0, 0, 0, 0.08);
+    --border-strong: rgba(0, 0, 0, 0.14);
+    --accent-soft: rgba(192, 74, 63, 0.16);
+  }
+  [data-theme="light"] .drawer-header {
+    background: linear-gradient(180deg, rgba(248, 246, 243, 0.92), rgba(238, 235, 230, 0.92));
+  }
+  [data-theme="light"] .msg.code {
+    background: #18161a;
+    color: #e6e6e6;
+  }
+
+  /* Toggle bar — fixed top-right */
+  .toolbar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+    z-index: 200;
+  }
+  .toggle-group {
+    display: flex;
+    background: var(--bg-elev-1);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    padding: 3px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .toggle-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .toggle-btn:hover { color: var(--text); }
+  .toggle-btn.active {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(192, 74, 63, 0.10), transparent 60%),
+      radial-gradient(900px 500px at 90% 110%, rgba(78, 186, 101, 0.04), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+    padding: 48px 24px 96px;
+  }
+
+  .page {
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  header.doc-header {
+    margin-bottom: 64px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 32px;
+    align-items: end;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+  }
+
+  .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .meta span:first-child {
+    color: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 144, 'wght' 400;
+    font-size: clamp(40px, 5vw, 72px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  h1 em {
+    font-style: italic;
+    font-variation-settings: 'opsz' 144, 'wght' 300;
+    color: var(--accent);
+  }
+
+  .subtitle {
+    margin-top: 16px;
+    max-width: 640px;
+    color: var(--text-dim);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  /* Variants grid */
+  .variants {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 1100px) {
+    .variants { grid-template-columns: 1fr; gap: 64px; }
+  }
+
+  .variant {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* iPhone Frame */
+  .device-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .device {
+    position: relative;
+    width: 320px;
+    height: 692px;
+    background: #000;
+    border-radius: 52px;
+    padding: 10px;
+    box-shadow:
+      0 0 0 2px #2a2a2a,
+      0 0 0 4px #0c0c0c,
+      0 60px 120px -20px rgba(0, 0, 0, 0.7),
+      0 30px 60px -15px rgba(192, 74, 63, 0.18);
+    overflow: hidden;
+  }
+
+  .screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    border-radius: 42px;
+    overflow: hidden;
+  }
+
+  /* Dynamic Island */
+  .island {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 30px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 50;
+  }
+
+  /* Status bar */
+  .statusbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px 0;
+    font-family: 'IBM Plex Sans', system-ui;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text);
+    z-index: 40;
+    letter-spacing: -0.01em;
+  }
+
+  .statusbar .right {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-right: 0;
+    font-size: 11px;
+  }
+
+  .signal-bars { display: inline-flex; gap: 2px; align-items: flex-end; height: 10px; }
+  .signal-bars i { width: 3px; background: var(--text); border-radius: 0.5px; }
+  .signal-bars i:nth-child(1) { height: 3px; }
+  .signal-bars i:nth-child(2) { height: 5px; }
+  .signal-bars i:nth-child(3) { height: 7px; }
+  .signal-bars i:nth-child(4) { height: 10px; }
+
+  .battery {
+    width: 24px;
+    height: 11px;
+    border: 1px solid var(--text);
+    border-radius: 3px;
+    padding: 1px;
+    position: relative;
+  }
+  .battery::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 3px;
+    width: 2px;
+    height: 5px;
+    background: var(--text);
+    border-radius: 0 1px 1px 0;
+  }
+  .battery-fill {
+    width: 78%;
+    height: 100%;
+    background: var(--text);
+    border-radius: 1px;
+  }
+
+  /* Portfolio backdrop */
+  .portfolio {
+    position: absolute;
+    inset: 0;
+    padding: 60px 20px 24px;
+    background:
+      radial-gradient(400px 200px at 80% 20%, rgba(192, 74, 63, 0.12), transparent 70%),
+      var(--bg);
+    overflow: hidden;
+  }
+
+  /* Cartesian plane — ambient background inside each iPhone */
+  .cartesian-mini {
+    position: absolute;
+    inset: -15%;
+    width: 130%;
+    height: 130%;
+    z-index: 0;
+    pointer-events: none;
+    transform: rotate(3deg);
+    opacity: 1;
+  }
+  .cartesian-mini svg { width: 100%; height: 100%; display: block; }
+
+  .portfolio-hero,
+  .project-card { position: relative; z-index: 2; }
+
+  .portfolio-hero {
+    padding: 16px 4px 20px;
+  }
+
+  .portfolio-kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .portfolio-title {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 144, 'wght' 400;
+    font-size: 28px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  .portfolio-title em { font-style: italic; color: var(--accent); font-variation-settings: 'opsz' 144, 'wght' 300; }
+
+  .portfolio-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .project-card {
+    background: var(--bg-elev-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-top: 12px;
+  }
+
+  .project-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .project-name {
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .project-desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* Chat icon FAB (peeks under drawer) */
+  .chat-fab {
+    position: absolute;
+    bottom: 24px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px -5px rgba(192, 74, 63, 0.5);
+    z-index: 5;
+  }
+
+  /* DRAWER — shared base */
+  .drawer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: var(--bg-elev-1);
+    border-top: 1px solid var(--border-strong);
+    border-radius: 28px 28px 0 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -20px 60px -10px rgba(0, 0, 0, 0.8);
+    z-index: 30;
+  }
+
+  .drawer-handle {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0 6px;
+    position: relative;
+  }
+  .drawer-handle i {
+    width: 36px;
+    height: 4px;
+    background: var(--text-faint);
+    border-radius: 2px;
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px 14px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(26, 26, 34, 0.85), rgba(19, 19, 26, 0.85));
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), #8a3229);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 15px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .header-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .agent-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .agent-name::after {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    background: var(--good);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(91, 214, 111, 0.2);
+  }
+
+  .agent-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .header-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-elev-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .header-btn:hover { color: var(--text); border-color: var(--accent); }
+  .header-btn svg { width: 14px; height: 14px; }
+
+  .drawer-body {
+    flex: 1;
+    overflow: hidden;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .msg {
+    max-width: 82%;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+  .msg.agent {
+    align-self: flex-start;
+    background: var(--bg-elev-2);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+  }
+  .msg.user {
+    align-self: flex-end;
+    background: var(--accent);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    line-height: 1.55;
+    padding: 12px;
+    background: #06060a;
+    border: 1px solid var(--border-strong);
+    max-width: 90%;
+    color: #c9c9d4;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .msg.code .kw { color: #e09a6f; }
+  .msg.code .str { color: #4eba65; }
+  .msg.code .cm { color: var(--text-faint); font-style: italic; }
+
+  .drawer-input {
+    padding: 10px 14px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-elev-1);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .input-pill {
+    flex: 1;
+    height: 40px;
+    border-radius: 20px;
+    background: var(--bg-elev-3);
+    border: 1px solid var(--border-strong);
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  .send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .send-btn svg { width: 16px; height: 16px; }
+
+  /* === V1: Bottom sheet 50% === */
+  .v1 .drawer {
+    top: 50%;
+    bottom: 0;
+  }
+
+  /* === V2: Fullscreen === */
+  .v2 .drawer {
+    top: 0;
+    bottom: 0;
+    border-radius: 0;
+    border-top: none;
+  }
+
+  .v2 .drawer-handle { display: none; }
+
+  .v2 .drawer-header {
+    padding-top: 60px;
+  }
+
+  .v2 .drawer-header .header-center {
+    flex: 1;
+    text-align: center;
+  }
+
+  .v2 .drawer-header .header-center .agent-name { justify-content: center; }
+
+  /* === V3: Snap points (70% default) === */
+  .v3 .drawer {
+    top: 30%;
+    bottom: 0;
+    transition: top 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .v3 .drawer[data-snap="30"] { top: 70%; }
+  .v3 .drawer[data-snap="100"] { top: 0; border-radius: 0; }
+
+  .v3 .drawer-handle {
+    padding: 10px 0 4px;
+  }
+
+  .v3 .snap-dots {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding-bottom: 6px;
+  }
+
+  .v3 .snap-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-faint);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .v3 .snap-dots span.active {
+    background: var(--accent);
+    width: 16px;
+    border-radius: 3px;
+  }
+
+  /* Legend */
+  .legend {
+    padding: 4px;
+  }
+
+  .legend-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .legend-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .legend-name {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 144, 'wght' 500;
+    font-size: 24px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .legend-name em { font-style: italic; font-variation-settings: 'opsz' 144, 'wght' 400; color: var(--text-dim); }
+
+  .legend-desc {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  .pros-cons {
+    display: grid;
+    gap: 10px;
+  }
+
+  .list {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .list-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .pros .list-label { color: var(--good); }
+  .cons .list-label { color: var(--bad); }
+
+  .list ul {
+    list-style: none;
+    padding-left: 14px;
+  }
+
+  .list li {
+    position: relative;
+    color: var(--text);
+    padding: 3px 0;
+  }
+  .pros li::before,
+  .cons li::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: 11px;
+    width: 6px;
+    height: 1.5px;
+    background: var(--text-faint);
+  }
+
+  /* Decision bar */
+  .decision {
+    margin-top: 72px;
+    padding: 32px;
+    background: var(--bg-elev-1);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 32px;
+    align-items: center;
+  }
+
+  @media (max-width: 700px) {
+    .decision { grid-template-columns: 1fr; }
+  }
+
+  .decision-label {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: 'opsz' 144, 'wght' 300;
+    font-style: italic;
+    font-size: 54px;
+    line-height: 0.9;
+    color: var(--accent);
+  }
+
+  .decision-body {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-dim);
+  }
+
+  .decision-body b { color: var(--text); font-weight: 500; }
+
+  .choice-hints {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .choice-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    background: var(--accent-soft);
+    border: 1px solid rgba(192, 74, 63, 0.35);
+    padding: 6px 12px;
+    border-radius: 999px;
+  }
+
+  /* Footer */
+  footer.foot {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.04em;
+  }
+
+  /* Grain overlay for texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.025;
+    mix-blend-mode: overlay;
+    z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E");
+  }
+
+  /* Reveal animation */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .variant { animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+  .variant:nth-child(1) { animation-delay: 0.1s; }
+  .variant:nth-child(2) { animation-delay: 0.2s; }
+  .variant:nth-child(3) { animation-delay: 0.3s; }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="toggle-group" role="group" aria-label="Tema">
+    <button class="toggle-btn active" data-theme-value="dark" title="Dark">Dark</button>
+    <button class="toggle-btn" data-theme-value="light" title="Light">Light</button>
+  </div>
+  <div class="toggle-group" role="group" aria-label="Idioma">
+    <button class="toggle-btn active" data-lang-value="pt" title="Português">PT</button>
+    <button class="toggle-btn" data-lang-value="en" title="English">EN</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <header class="doc-header">
+    <div class="meta">
+      <span>D8 · MOBILE DRAWER</span>
+      <span>REV 2026·04·17</span>
+      <span>SHARED AUTH REALM</span>
+    </div>
+    <div>
+      <h1 data-i18n="title"></h1>
+      <p class="subtitle" data-i18n="subtitle"></p>
+      <div style="margin-top:16px;display:inline-flex;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;">
+        <a href="#" style="color:var(--accent);background:var(--accent-soft);border:1px solid rgba(215,119,87,0.4);padding:7px 12px;border-radius:999px;text-decoration:none;letter-spacing:0.04em;" data-i18n="nav.mobile"></a>
+        <a href="d8-desktop-drawer.html" style="color:var(--text);background:var(--bg-elev-2);border:1px solid var(--border-strong);padding:7px 12px;border-radius:999px;text-decoration:none;letter-spacing:0.04em;" data-i18n="nav.desktop"></a>
+        <a href="d8-cartesian-motion.html" style="color:var(--text);background:var(--bg-elev-2);border:1px solid var(--border-strong);padding:7px 12px;border-radius:999px;text-decoration:none;letter-spacing:0.04em;" data-i18n="nav.motion"></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="variants">
+
+    <!-- ============ V1 — BOTTOM SHEET 50% ============ -->
+    <div class="variant v1">
+      <div class="device-wrap">
+        <div class="device">
+          <div class="screen">
+            <div class="island"></div>
+            <div class="statusbar">
+              <span>9:41</span>
+              <span class="right">
+                <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+                <span style="font-size:10px">5G</span>
+                <span class="battery"><span class="battery-fill"></span></span>
+              </span>
+            </div>
+
+            <div class="portfolio">
+              <div class="cartesian-mini" aria-hidden="true">
+                <svg viewBox="-500 -500 1000 1000" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <pattern id="m-grid-v1" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+                      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="var(--grid-line)" stroke-width="0.6"/>
+                    </pattern>
+                    <pattern id="m-grid-major-v1" x="0" y="0" width="240" height="240" patternUnits="userSpaceOnUse">
+                      <path d="M 240 0 L 0 0 0 240" fill="none" stroke="var(--grid-major)" stroke-width="0.8"/>
+                    </pattern>
+                  </defs>
+                  <rect x="-500" y="-500" width="1000" height="1000" fill="url(#m-grid-v1)"/>
+                  <rect x="-500" y="-500" width="1000" height="1000" fill="url(#m-grid-major-v1)"/>
+                  <line x1="-500" y1="0" x2="500" y2="0" stroke="var(--axis)" stroke-width="1.2"/>
+                  <line x1="0" y1="-500" x2="0" y2="500" stroke="var(--axis)" stroke-width="1.2"/>
+                  <circle cx="0" cy="0" r="4" fill="var(--accent)"/>
+                  <g fill="var(--accent)" opacity="0.55">
+                    <circle cx="-260" cy="120" r="3"/>
+                    <circle cx="-120" cy="30" r="3"/>
+                    <circle cx="40" cy="-50" r="3"/>
+                    <circle cx="200" cy="-140" r="3"/>
+                    <circle cx="320" cy="-220" r="3"/>
+                  </g>
+                  <path d="M -260 120 Q -60 -90, 320 -220" fill="none" stroke="var(--accent)" stroke-width="1.3" opacity="0.5" stroke-dasharray="3 4"/>
+                  <circle r="14" fill="none" stroke="var(--accent)" stroke-width="1.5" opacity="0.7">
+                    <animateMotion dur="6.5s" repeatCount="indefinite"
+                                   path="M -260 120 Q -60 -90, 320 -220"
+                                   keyPoints="0;1;0" keyTimes="0;0.5;1"
+                                   calcMode="spline"
+                                   keySplines="0.4 0 0.2 1; 0.4 0 0.2 1"/>
+                    <animate attributeName="r" values="10;18;10" dur="2.4s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle r="3.5" fill="var(--accent)" opacity="1">
+                    <animateMotion dur="6.5s" repeatCount="indefinite"
+                                   path="M -260 120 Q -60 -90, 320 -220"
+                                   keyPoints="0;1;0" keyTimes="0;0.5;1"
+                                   calcMode="spline"
+                                   keySplines="0.4 0 0.2 1; 0.4 0 0.2 1"/>
+                  </circle>
+                </svg>
+              </div>
+              <div class="portfolio-hero">
+                <div class="portfolio-kicker">● Portfolio · jader</div>
+                <div class="portfolio-title">Jader <em>Germano</em><br>Senior Engineer</div>
+                <div class="portfolio-sub">Distributed systems, AI tooling & developer experience. Recife, Brasil.</div>
+              </div>
+              <div class="project-card">
+                <div class="project-tag">2026 · Flagship</div>
+                <div class="project-name">openclaude-hub</div>
+                <div class="project-desc">Web UI gateway para CLIs de IA com multi-provider e streaming.</div>
+              </div>
+              <div class="project-card">
+                <div class="project-tag">2026</div>
+                <div class="project-name">jpglabs-portfolio</div>
+                <div class="project-desc">Vitrine pública com chat embed e wildcard subdomains.</div>
+              </div>
+            </div>
+
+            <div class="drawer">
+              <div class="drawer-handle"><i></i></div>
+              <div class="drawer-header">
+                <div class="avatar">J</div>
+                <div class="header-info">
+                  <div class="agent-name">JPGLabs Assistant</div>
+                  <div class="agent-status">Online · Contexto: Jader</div>
+                </div>
+                <button class="header-btn" title="Expandir">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                </button>
+              </div>
+              <div class="drawer-body">
+                <div class="msg agent">Oi! Posso te contar sobre os projetos do Jader. O que chamou atenção?</div>
+                <div class="msg user">Stack do openclaude-hub?</div>
+                <div class="msg code"><span class="cm">// stack resumido</span>
+Node 22 + Express 5 + ws
+Postgres + drizzle-orm
+Deploy: systemd + Caddy</div>
+              </div>
+              <div class="drawer-input">
+                <div class="input-pill">Pergunte sobre um projeto…</div>
+                <div class="send-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l14-7-5 14-3-6-6-1z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-head">
+          <span class="legend-id">V1</span>
+          <span class="legend-name" data-i18n="v1.name">Bottom <em>Sheet</em></span>
+        </div>
+        <p class="legend-desc" data-i18n="v1.desc">
+          Metade inferior. Portfólio visível acima. Handle de arrasto.
+          Expansão para tela cheia via botão.
+        </p>
+        <div class="pros-cons">
+          <div class="list pros">
+            <div class="list-label" data-i18n="label.pros">✓ Vantagens</div>
+            <ul data-i18n="v1.pros" data-i18n-html="true">
+              <li>Contexto do portfólio nunca desaparece</li>
+              <li>Implementação mais simples (sem snap logic)</li>
+              <li>Curva de aprendizado curta — padrão iOS Messages</li>
+            </ul>
+          </div>
+          <div class="list cons">
+            <div class="list-label" data-i18n="label.cons">✗ Custos</div>
+            <ul data-i18n="v1.cons" data-i18n-html="true">
+              <li>Sessão longa sofre com altura fixa</li>
+              <li>Teclado iOS sobe e comprime drawer pela metade</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ V2 — FULLSCREEN ============ -->
+    <div class="variant v2">
+      <div class="device-wrap">
+        <div class="device">
+          <div class="screen">
+            <div class="island"></div>
+            <div class="statusbar">
+              <span>9:41</span>
+              <span class="right">
+                <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+                <span style="font-size:10px">5G</span>
+                <span class="battery"><span class="battery-fill"></span></span>
+              </span>
+            </div>
+
+            <div class="drawer">
+              <div class="drawer-header">
+                <button class="header-btn" title="Fechar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <div class="header-center">
+                  <div class="agent-name">JPGLabs Assistant</div>
+                  <div class="agent-status">Conversando com · Jader</div>
+                </div>
+                <button class="header-btn" title="Abrir em janela cheia">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </button>
+              </div>
+              <div class="drawer-body">
+                <div class="msg agent">Oi! Posso te contar sobre os projetos do Jader. O que chamou atenção?</div>
+                <div class="msg user">Stack do openclaude-hub?</div>
+                <div class="msg code"><span class="cm">// stack resumido</span>
+<span class="kw">const</span> stack = {
+  runtime: <span class="str">'Node 22'</span>,
+  api: <span class="str">'Express 5 + ws'</span>,
+  db: <span class="str">'Postgres + drizzle'</span>,
+  deploy: <span class="str">'systemd + Caddy'</span>,
+}</div>
+                <div class="msg agent">Quer ver o diagrama de deploy ou uma demo ao vivo?</div>
+              </div>
+              <div class="drawer-input">
+                <div class="input-pill">Pergunte sobre um projeto…</div>
+                <div class="send-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l14-7-5 14-3-6-6-1z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-head">
+          <span class="legend-id">V2</span>
+          <span class="legend-name" data-i18n="v2.name">Fullscreen <em>Modal</em></span>
+        </div>
+        <p class="legend-desc" data-i18n="v2.desc">
+          Tela cheia, portfólio desaparece. Fecha pelo X. Link para abrir em
+          <code style="font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:11px">chat.jpglabs.com.br</code>.
+        </p>
+        <div class="pros-cons">
+          <div class="list pros">
+            <div class="list-label" data-i18n="label.pros">✓ Vantagens</div>
+            <ul data-i18n="v2.pros" data-i18n-html="true">
+              <li>Zero competição visual — foco absoluto no chat</li>
+              <li>Teclado não comprime UI (aproveita 100% da tela)</li>
+              <li>Paridade com chat.jpglabs.com.br (migrar thread é trivial)</li>
+            </ul>
+          </div>
+          <div class="list cons">
+            <div class="list-label" data-i18n="label.cons">✗ Custos</div>
+            <ul data-i18n="v2.cons" data-i18n-html="true">
+              <li>Usuário perde onde estava no portfólio</li>
+              <li>Consulta rápida vira "sair e voltar" — fricção</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ V3 — SNAP POINTS (30/70/100) ============ -->
+    <div class="variant v3">
+      <div class="device-wrap">
+        <div class="device">
+          <div class="screen">
+            <div class="island"></div>
+            <div class="statusbar">
+              <span>9:41</span>
+              <span class="right">
+                <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+                <span style="font-size:10px">5G</span>
+                <span class="battery"><span class="battery-fill"></span></span>
+              </span>
+            </div>
+
+            <div class="portfolio">
+              <div class="cartesian-mini" aria-hidden="true">
+                <svg viewBox="-500 -500 1000 1000" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <pattern id="m-grid-v3" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+                      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="var(--grid-line)" stroke-width="0.6"/>
+                    </pattern>
+                    <pattern id="m-grid-major-v3" x="0" y="0" width="240" height="240" patternUnits="userSpaceOnUse">
+                      <path d="M 240 0 L 0 0 0 240" fill="none" stroke="var(--grid-major)" stroke-width="0.8"/>
+                    </pattern>
+                  </defs>
+                  <rect x="-500" y="-500" width="1000" height="1000" fill="url(#m-grid-v3)"/>
+                  <rect x="-500" y="-500" width="1000" height="1000" fill="url(#m-grid-major-v3)"/>
+                  <line x1="-500" y1="0" x2="500" y2="0" stroke="var(--axis)" stroke-width="1.2"/>
+                  <line x1="0" y1="-500" x2="0" y2="500" stroke="var(--axis)" stroke-width="1.2"/>
+                  <circle cx="0" cy="0" r="4" fill="var(--accent)"/>
+                  <g fill="var(--accent)" opacity="0.55">
+                    <circle cx="-260" cy="120" r="3"/>
+                    <circle cx="-120" cy="30" r="3"/>
+                    <circle cx="40" cy="-50" r="3"/>
+                    <circle cx="200" cy="-140" r="3"/>
+                    <circle cx="320" cy="-220" r="3"/>
+                  </g>
+                  <path d="M -260 120 Q -60 -90, 320 -220" fill="none" stroke="var(--accent)" stroke-width="1.3" opacity="0.5" stroke-dasharray="3 4"/>
+                  <circle r="14" fill="none" stroke="var(--accent)" stroke-width="1.5" opacity="0.7">
+                    <animateMotion dur="6.5s" repeatCount="indefinite"
+                                   path="M -260 120 Q -60 -90, 320 -220"
+                                   keyPoints="0;1;0" keyTimes="0;0.5;1"
+                                   calcMode="spline"
+                                   keySplines="0.4 0 0.2 1; 0.4 0 0.2 1"/>
+                    <animate attributeName="r" values="10;18;10" dur="2.4s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle r="3.5" fill="var(--accent)" opacity="1">
+                    <animateMotion dur="6.5s" repeatCount="indefinite"
+                                   path="M -260 120 Q -60 -90, 320 -220"
+                                   keyPoints="0;1;0" keyTimes="0;0.5;1"
+                                   calcMode="spline"
+                                   keySplines="0.4 0 0.2 1; 0.4 0 0.2 1"/>
+                  </circle>
+                </svg>
+              </div>
+              <div class="portfolio-hero">
+                <div class="portfolio-kicker">● Portfolio · jader</div>
+                <div class="portfolio-title">Jader <em>Germano</em></div>
+                <div class="portfolio-sub">Senior Engineer · AI Tooling</div>
+              </div>
+              <div class="project-card">
+                <div class="project-tag">2026</div>
+                <div class="project-name">openclaude-hub</div>
+              </div>
+            </div>
+
+            <div class="drawer" id="v3-drawer" data-snap="70">
+              <div class="drawer-handle"><i></i></div>
+              <div class="snap-dots" id="v3-dots">
+                <span data-snap="30" title="30%"></span>
+                <span data-snap="70" class="active" title="70%"></span>
+                <span data-snap="100" title="100%"></span>
+              </div>
+              <div class="drawer-header">
+                <div class="avatar">J</div>
+                <div class="header-info">
+                  <div class="agent-name">JPGLabs Assistant</div>
+                  <div class="agent-status">Snap: <span id="v3-label">70%</span></div>
+                </div>
+                <button class="header-btn" title="Expandir">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                </button>
+              </div>
+              <div class="drawer-body">
+                <div class="msg agent">Oi! Posso te contar sobre os projetos do Jader.</div>
+                <div class="msg user">Stack do openclaude-hub?</div>
+                <div class="msg code"><span class="cm">// stack resumido</span>
+Node 22 + Express 5 + ws
+Postgres + drizzle-orm
+Deploy: systemd + Caddy</div>
+                <div class="msg agent">Quer ver o diagrama de deploy?</div>
+              </div>
+              <div class="drawer-input">
+                <div class="input-pill">Pergunte sobre um projeto…</div>
+                <div class="send-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l14-7-5 14-3-6-6-1z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-head">
+          <span class="legend-id">V3</span>
+          <span class="legend-name" data-i18n="v3.name">Snap <em>Points</em> · 30 / 70 / 100</span>
+        </div>
+        <p class="legend-desc" data-i18n="v3.desc">
+          Três alturas pré-definidas. Swipe alterna. Clique nas bolinhas no
+          protótipo para testar os snaps.
+        </p>
+        <div class="pros-cons">
+          <div class="list pros">
+            <div class="list-label" data-i18n="label.pros">✓ Vantagens</div>
+            <ul data-i18n="v3.pros" data-i18n-html="true">
+              <li>Flexibilidade máxima — respeita intenção do usuário</li>
+              <li>Padrão iOS Maps / Apple Music (familiaridade alta)</li>
+              <li>30%: consulta minimalista · 70%: conversa · 100%: sessão</li>
+            </ul>
+          </div>
+          <div class="list cons">
+            <div class="list-label" data-i18n="label.cons">✗ Custos</div>
+            <ul data-i18n="v3.cons" data-i18n-html="true">
+              <li>Implementação mais complexa (gesture + momentum)</li>
+              <li>Curva cognitiva: usuário precisa descobrir os snaps</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="decision">
+    <div class="decision-label" data-i18n="decision.label" data-i18n-html="true">Qual<br>escolher?</div>
+    <div class="decision-body">
+      <span data-i18n="decision.body" data-i18n-html="true"><b>Recomendação do squad:</b> V3 (snap points) é ideal se o produto evoluir
+      para sessões longas + consulta rápida coexistindo. V1 é a aposta mais conservadora
+      e resolve 80% dos casos sem complexidade. V2 só faz sentido quando o drawer
+      deixa de ser embed e vira chat-first.</span>
+      <div class="choice-hints" data-i18n="decision.hints" data-i18n-html="true">
+        <span class="choice-hint">V1 · MVP seguro</span>
+        <span class="choice-hint">V3 · produto diferenciado</span>
+        <span class="choice-hint">V2 · se migrar pra chat-first</span>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <span>jpglabs-portfolio / prototypes / d8-mobile-drawer.html</span>
+    <span data-i18n="footer.status">Decisão pendente · PO</span>
+  </footer>
+
+</div>
+
+<script>
+  // ==================== i18n ====================
+  const I18N = {
+    pt: {
+      'title': 'Como o chat <em>habita</em> o portfólio<br>no mobile.',
+      'subtitle': 'Três comportamentos de drawer embed testados lado a lado. O widget mora em <code style="font-family:\'JetBrains Mono\',monospace;color:var(--accent);font-size:13px">{slug}.jpglabs.com.br</code> e precisa conviver com leitura de portfólio sem roubar foco. Escolha o que respeita mais o contexto — ou peça a 4ª opção.',
+      'nav.mobile': 'Mobile (esta página)',
+      'nav.desktop': 'Desktop (3 variantes) →',
+      'nav.motion': '✦ Cartesian Motion →',
+      'label.pros': '✓ Vantagens',
+      'label.cons': '✗ Custos',
+      'v1.name': 'Bottom <em>Sheet</em>',
+      'v1.desc': 'Metade inferior. Portfólio visível acima. Handle de arrasto. Expansão para tela cheia via botão.',
+      'v1.pros': '<li>Contexto do portfólio nunca desaparece</li><li>Implementação mais simples (sem snap logic)</li><li>Curva de aprendizado curta — padrão iOS Messages</li>',
+      'v1.cons': '<li>Sessão longa sofre com altura fixa</li><li>Teclado iOS sobe e comprime drawer pela metade</li>',
+      'v2.name': 'Fullscreen <em>Modal</em>',
+      'v2.desc': 'Tela cheia, portfólio desaparece. Fecha pelo X. Link para abrir em <code style="font-family:\'JetBrains Mono\',monospace;color:var(--accent);font-size:11px">chat.jpglabs.com.br</code>.',
+      'v2.pros': '<li>Zero competição visual — foco absoluto no chat</li><li>Teclado não comprime UI (aproveita 100% da tela)</li><li>Paridade com chat.jpglabs.com.br (migrar thread é trivial)</li>',
+      'v2.cons': '<li>Usuário perde onde estava no portfólio</li><li>Consulta rápida vira "sair e voltar" — fricção</li>',
+      'v3.name': 'Snap <em>Points</em> · 30 / 70 / 100',
+      'v3.desc': 'Três alturas pré-definidas. Swipe alterna. Clique nas bolinhas no protótipo para testar os snaps.',
+      'v3.pros': '<li>Flexibilidade máxima — respeita intenção do usuário</li><li>Padrão iOS Maps / Apple Music (familiaridade alta)</li><li>30%: consulta minimalista · 70%: conversa · 100%: sessão</li>',
+      'v3.cons': '<li>Implementação mais complexa (gesture + momentum)</li><li>Curva cognitiva: usuário precisa descobrir os snaps</li>',
+      'decision.label': 'Qual<br>escolher?',
+      'decision.body': '<b>Recomendação do squad:</b> V3 (snap points) é ideal se o produto evoluir para sessões longas + consulta rápida coexistindo. V1 é a aposta mais conservadora e resolve 80% dos casos sem complexidade. V2 só faz sentido quando o drawer deixa de ser embed e vira chat-first.',
+      'decision.hints': '<span class="choice-hint">V1 · MVP seguro</span><span class="choice-hint">V3 · produto diferenciado</span><span class="choice-hint">V2 · se migrar pra chat-first</span>',
+      'footer.status': 'Decisão pendente · PO',
+    },
+    en: {
+      'title': 'How the chat <em>inhabits</em> the portfolio<br>on mobile.',
+      'subtitle': 'Three drawer embed behaviors tested side by side. The widget lives at <code style="font-family:\'JetBrains Mono\',monospace;color:var(--accent);font-size:13px">{slug}.jpglabs.com.br</code> and must coexist with portfolio reading without stealing focus. Pick the one that respects context the most — or ask for a 4th option.',
+      'nav.mobile': 'Mobile (this page)',
+      'nav.desktop': 'Desktop (3 variants) →',
+      'nav.motion': '✦ Cartesian Motion →',
+      'label.pros': '✓ Pros',
+      'label.cons': '✗ Cons',
+      'v1.name': 'Bottom <em>Sheet</em>',
+      'v1.desc': 'Bottom half. Portfolio visible above. Drag handle. Expand-to-fullscreen button.',
+      'v1.pros': '<li>Portfolio context never disappears</li><li>Simpler implementation (no snap logic)</li><li>Short learning curve — iOS Messages pattern</li>',
+      'v1.cons': '<li>Long sessions suffer from fixed height</li><li>iOS keyboard rises and compresses drawer to half</li>',
+      'v2.name': 'Fullscreen <em>Modal</em>',
+      'v2.desc': 'Full screen, portfolio disappears. Close with X. Link to open at <code style="font-family:\'JetBrains Mono\',monospace;color:var(--accent);font-size:11px">chat.jpglabs.com.br</code>.',
+      'v2.pros': '<li>Zero visual competition — absolute focus on chat</li><li>Keyboard does not compress UI (full screen)</li><li>Parity with chat.jpglabs.com.br (trivial thread migration)</li>',
+      'v2.cons': '<li>User loses where they were in the portfolio</li><li>Quick lookup becomes "leave and return" — friction</li>',
+      'v3.name': 'Snap <em>Points</em> · 30 / 70 / 100',
+      'v3.desc': 'Three preset heights. Swipe alternates. Click the dots in the prototype to test the snaps.',
+      'v3.pros': '<li>Maximum flexibility — respects user intent</li><li>iOS Maps / Apple Music pattern (high familiarity)</li><li>30%: minimal lookup · 70%: conversation · 100%: deep session</li>',
+      'v3.cons': '<li>More complex implementation (gesture + momentum)</li><li>Cognitive curve: user must discover the snaps</li>',
+      'decision.label': 'Which<br>to pick?',
+      'decision.body': '<b>Squad recommendation:</b> V3 (snap points) is ideal if the product evolves toward long sessions + quick lookups coexisting. V1 is the conservative bet and solves 80% of cases without complexity. V2 only makes sense when the drawer stops being embed and becomes chat-first.',
+      'decision.hints': '<span class="choice-hint">V1 · safe MVP</span><span class="choice-hint">V3 · differentiated product</span><span class="choice-hint">V2 · if pivoting to chat-first</span>',
+      'footer.status': 'Decision pending · PO',
+    },
+  };
+
+  function applyLang(lang) {
+    document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      const txt = I18N[lang][key];
+      if (txt != null) el.innerHTML = txt;
+    });
+    document.querySelectorAll('[data-lang-value]').forEach(b => {
+      b.classList.toggle('active', b.dataset.langValue === lang);
+    });
+    try { localStorage.setItem('d8.lang', lang); } catch (_) {}
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    document.querySelectorAll('[data-theme-value]').forEach(b => {
+      b.classList.toggle('active', b.dataset.themeValue === theme);
+    });
+    try { localStorage.setItem('d8.theme', theme); } catch (_) {}
+  }
+
+  document.querySelectorAll('[data-theme-value]').forEach(b => {
+    b.addEventListener('click', () => applyTheme(b.dataset.themeValue));
+  });
+  document.querySelectorAll('[data-lang-value]').forEach(b => {
+    b.addEventListener('click', () => applyLang(b.dataset.langValue));
+  });
+
+  // Restore preferences or pick sensible defaults
+  const storedTheme = (() => { try { return localStorage.getItem('d8.theme'); } catch (_) { return null; } })();
+  const storedLang = (() => { try { return localStorage.getItem('d8.lang'); } catch (_) { return null; } })();
+  applyTheme(storedTheme || 'dark');
+  applyLang(storedLang || 'pt');
+
+  // ==================== V3 snap points interaction ====================
+  const v3Drawer = document.getElementById('v3-drawer');
+  const v3Dots = document.querySelectorAll('#v3-dots span');
+  const v3Label = document.getElementById('v3-label');
+
+  v3Dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const snap = dot.dataset.snap;
+      v3Drawer.dataset.snap = snap;
+      v3Dots.forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+      v3Label.textContent = snap + '%';
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>openClaude Hub — JPG Labs</title>
+    <meta name="description" content="Unified chat for Claude, GPT, Gemini, and local models — self-hosted on JPG Labs." />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Inline icon sprite (Lucide-style, line-based) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/>
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14M5 12h14"/>
+        </symbol>
+        <symbol id="i-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="16" rx="2"/>
+          <path d="M9 4v16"/>
+        </symbol>
+        <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+        </symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+        </symbol>
+        <symbol id="i-chev-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9l6 6 6-6"/>
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12l4.5 4.5L19 7"/>
+        </symbol>
+        <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12a8 8 0 0 1-11.8 7L3 21l2-6.2A8 8 0 1 1 21 12z"/>
+        </symbol>
+        <symbol id="i-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 17l5-5-5-5M12 19h8"/>
+        </symbol>
+        <symbol id="i-paperclip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 11l-8.5 8.5a5.5 5.5 0 0 1-7.8-7.8L13 3.2a3.7 3.7 0 0 1 5.2 5.2L9.7 17a1.8 1.8 0 0 1-2.6-2.6L15 6.6"/>
+        </symbol>
+        <symbol id="i-wrench" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.7 6.3a4 4 0 0 0 4.6 5.6l-8 8a2 2 0 0 1-2.8-2.8l8-8a4 4 0 0 0-1.8-2.8z"/>
+        </symbol>
+        <symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 19V5M5 12l7-7 7 7"/>
+        </symbol>
+        <symbol id="i-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 4l5 8-5 8M12 4l5 8-5 8"/>
+        </symbol>
+      </defs>
+    </svg>
+
+    <div class="app" id="app">
+      <!-- ======================= SIDEBAR ======================= -->
+      <aside class="sidebar" aria-label="Conversations">
+        <div class="sidebar__header">
+          <div class="brand">
+            <span class="brand__mark" aria-hidden="true">
+              <svg><use href="#i-logo"/></svg>
+            </span>
+            <span class="brand__name">open<em>Claude</em> Hub</span>
+          </div>
+          <button class="icon-btn" id="toggleSidebar" title="Collapse sidebar" aria-label="Collapse sidebar">
+            <svg><use href="#i-panel"/></svg>
+          </button>
+        </div>
+
+        <div class="sidebar__actions">
+          <button class="new-chat" type="button">
+            <svg><use href="#i-plus"/></svg>
+            <span>New chat</span>
+          </button>
+        </div>
+
+        <div class="sidebar__section-title">Recent</div>
+        <nav class="conv-list" aria-label="Recent conversations">
+          <button class="conv is-active" type="button">
+            <span class="conv__title">Refactor auth flow with Supabase</span>
+            <span class="conv__meta">Claude Sonnet 4.6 · 2h ago</span>
+          </button>
+          <button class="conv" type="button">
+            <span class="conv__title">Debug Tailscale MagicDNS on VPS</span>
+            <span class="conv__meta">Claude Opus 4.7 · Yesterday</span>
+          </button>
+          <button class="conv" type="button">
+            <span class="conv__title">Draft JPG Labs Q2 roadmap</span>
+            <span class="conv__meta">GPT-4 Turbo · Tue</span>
+          </button>
+          <button class="conv" type="button">
+            <span class="conv__title">Translate Pi runtime README to PT-BR</span>
+            <span class="conv__meta">Gemini 2.5 Pro · Mon</span>
+          </button>
+          <button class="conv" type="button">
+            <span class="conv__title">Local Llama: summarize VPS logs</span>
+            <span class="conv__meta">Llama 3.1 · Apr 12</span>
+          </button>
+        </nav>
+
+        <div class="sidebar__footer">
+          <div class="sidebar__footer-left">
+            <span class="avatar" aria-hidden="true">JG</span>
+            <span class="sidebar__email">jader@jpglabs.com.br</span>
+          </div>
+          <button class="icon-btn" title="Settings" aria-label="Settings">
+            <svg><use href="#i-settings"/></svg>
+          </button>
+        </div>
+      </aside>
+
+      <!-- ======================= MAIN ======================= -->
+      <main class="main">
+        <!-- Top bar -->
+        <div class="topbar">
+          <div class="topbar__left">
+            <!-- Model picker -->
+            <div class="model-picker" id="modelPicker">
+              <button class="model-picker__btn" id="modelBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                <span class="dot" aria-hidden="true"></span>
+                <span id="modelLabel">Claude Sonnet 4.6</span>
+                <svg class="chev"><use href="#i-chev-down"/></svg>
+              </button>
+              <div class="model-picker__menu" role="listbox" aria-label="Select model">
+                <button class="model-option is-selected" role="option" data-label="Claude Sonnet 4.6">
+                  <span class="model-option__label">Claude Sonnet 4.6</span>
+                  <span class="model-option__tag">Anthropic</span>
+                  <svg class="check"><use href="#i-check"/></svg>
+                </button>
+                <button class="model-option" role="option" data-label="Claude Opus 4.7">
+                  <span class="model-option__label">Claude Opus 4.7</span>
+                  <span class="model-option__tag">Anthropic</span>
+                  <svg class="check"><use href="#i-check"/></svg>
+                </button>
+                <button class="model-option" role="option" data-label="GPT-4 Turbo">
+                  <span class="model-option__label">GPT-4 Turbo</span>
+                  <span class="model-option__tag">OpenAI</span>
+                  <svg class="check"><use href="#i-check"/></svg>
+                </button>
+                <button class="model-option" role="option" data-label="Gemini 2.5 Pro">
+                  <span class="model-option__label">Gemini 2.5 Pro</span>
+                  <span class="model-option__tag">Google</span>
+                  <svg class="check"><use href="#i-check"/></svg>
+                </button>
+                <button class="model-option" role="option" data-label="Llama 3.1">
+                  <span class="model-option__label">Llama 3.1</span>
+                  <span class="model-option__tag">Ollama · local</span>
+                  <svg class="check"><use href="#i-check"/></svg>
+                </button>
+                <button class="model-option" role="option" data-label="Mistral">
+                  <span class="model-option__label">Mistral</span>
+                  <span class="model-option__tag">Ollama · local</span>
+                  <svg class="check"><use href="#i-check"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Mode tabs -->
+            <div class="mode-tabs" role="tablist" aria-label="Mode">
+              <button class="mode-tab is-active" role="tab" aria-selected="true" data-mode="chat">
+                <svg><use href="#i-chat"/></svg>
+                <span>Chat</span>
+              </button>
+              <button class="mode-tab" role="tab" aria-selected="false" data-mode="agent">
+                <svg><use href="#i-terminal"/></svg>
+                <span>Agent (terminal)</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="topbar__right">
+            <button class="icon-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+              <svg id="themeIcon"><use href="#i-moon"/></svg>
+            </button>
+            <div class="user-chip">
+              <span class="avatar" aria-hidden="true">JG</span>
+              <span>jader@jpglabs.com.br</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat messages -->
+        <section class="chat" aria-label="Conversation">
+          <div class="chat__inner">
+            <!-- User -->
+            <article class="msg msg--user">
+              <div class="msg__label">You</div>
+              <div class="msg__bubble">
+                Audit the Tailscale peer status on <code class="inline">jpglabs-vps</code> and tell me whether MagicDNS is healthy. If it's flapping, start a watcher.
+              </div>
+            </article>
+
+            <!-- Assistant (chat) -->
+            <article class="msg msg--assistant">
+              <div class="msg__label">
+                <span class="dot"></span>
+                Claude Sonnet 4.6
+              </div>
+              <div class="msg__bubble">
+                <p>I checked <code class="inline">tailscale status --json</code> on the VPS. The peer <strong>jpglabs-vps-tailnet</strong> is online, but MagicDNS has resolved the hostname inconsistently over the last 10 minutes — three of the last eight lookups fell back to the public IP.</p>
+                <p>Likely cause: the MagicDNS resolver in <code class="inline">/etc/resolv.conf</code> is being overwritten by <code class="inline">systemd-resolved</code> after network changes. Two options:</p>
+                <ul>
+                  <li>Pin <code class="inline">100.100.100.100</code> as the primary resolver via <code class="inline">tailscale set --accept-dns=true</code>.</li>
+                  <li>Or drop a <code class="inline">resolved.conf.d/</code> override so systemd stops clobbering it on wake.</li>
+                </ul>
+                <p>Want me to switch to <strong>Agent mode</strong> and apply option 2 now, with a rollback?</p>
+              </div>
+            </article>
+
+            <!-- User -->
+            <article class="msg msg--user">
+              <div class="msg__label">You</div>
+              <div class="msg__bubble">
+                Yes — switch to Agent mode and show me what you're running.
+              </div>
+            </article>
+
+            <!-- Assistant (agent — terminal output) -->
+            <article class="msg msg--assistant">
+              <div class="msg__label">
+                <span class="dot"></span>
+                Claude Sonnet 4.6 · Agent
+              </div>
+              <div class="msg__bubble">
+                <p>Running on <code class="inline">jpglabs-vps</code> via Tailscale SSH. Dry-run first, then apply:</p>
+                <div class="terminal" role="region" aria-label="Terminal output">
+                  <div class="terminal__header">
+                    <span class="terminal__dot terminal__dot--red"></span>
+                    <span class="terminal__dot terminal__dot--yellow"></span>
+                    <span class="terminal__dot terminal__dot--green"></span>
+                    <span class="terminal__title">jader@jpglabs-vps — zsh</span>
+                  </div>
+<span class="prompt">$</span> sudo mkdir -p /etc/systemd/resolved.conf.d
+<span class="prompt">$</span> sudo tee /etc/systemd/resolved.conf.d/tailscale.conf &lt;&lt;'EOF'
+<span class="out">[Resolve]</span>
+<span class="out">DNS=100.100.100.100</span>
+<span class="out">Domains=~ts.net</span>
+EOF
+<span class="prompt">$</span> sudo systemctl restart systemd-resolved
+<span class="prompt">$</span> tailscale status --json | jq '.Peer | to_entries[0].value.Online'
+<span class="out">true</span>
+<span class="prompt">$</span> dig +short jpglabs-vps-tailnet
+<span class="out">100.96.14.22</span>
+<span class="muted"># resolver pinned; 20/20 lookups consistent over 30s window</span>
+                </div>
+                <p>MagicDNS is stable. I left a <code class="inline">watch</code> running for 5 min to confirm — zero fallbacks. Rollback snippet saved to <code class="inline">~/.jpglabs/rollback/magicdns-2026-04-17.sh</code>.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- Input dock -->
+        <div class="dock">
+          <div class="dock__inner">
+            <form class="composer" id="composer" onsubmit="return false;">
+              <textarea
+                id="input"
+                rows="1"
+                placeholder="Message openClaude Hub..."
+                aria-label="Message openClaude Hub"
+              ></textarea>
+              <div class="composer__row">
+                <div class="composer__tools">
+                  <button type="button" class="tool-btn" title="Attach file">
+                    <svg><use href="#i-paperclip"/></svg>
+                  </button>
+                  <button type="button" class="tool-btn" title="Tools">
+                    <svg><use href="#i-wrench"/></svg>
+                    <span>Tools</span>
+                  </button>
+                </div>
+                <button type="submit" class="send-btn" title="Send" aria-label="Send">
+                  <svg><use href="#i-arrow-up"/></svg>
+                </button>
+              </div>
+            </form>
+            <p class="dock__note">openClaude can make mistakes — verify outputs for critical tasks.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

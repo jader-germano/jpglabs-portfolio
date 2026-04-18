@@ -15,7 +15,7 @@ type GuardianData = {
 };
 
 const Guardian: React.FC = () => {
-  const { isPrimeOwner } = useAuth();
+  const { isRootAdmin } = useAuth();
   const [data, setData] = useState<GuardianData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -101,7 +101,7 @@ const Guardian: React.FC = () => {
               <h2 className="text-xl font-black uppercase tracking-tight text-white flex items-center gap-3">
                 <Activity size={20} className="text-red-500" /> Security Event Log
               </h2>
-              {isPrimeOwner && (
+              {isRootAdmin && (
                 <button className="px-5 py-2 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-white transition-all">
                   Export JSON
                 </button>
@@ -134,7 +134,7 @@ const Guardian: React.FC = () => {
                     <p className="text-sm font-bold text-gray-300">{log.event}</p>
                   </div>
                   
-                  {isPrimeOwner && (
+                  {isRootAdmin && (
                     <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl text-gray-500 hover:text-white transition-all shrink-0">
                       <Terminal size={14} />
                     </button>
