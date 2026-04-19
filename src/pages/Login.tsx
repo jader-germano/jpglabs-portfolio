@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Github, Chrome, ShieldAlert, LogIn } from 'lucide-react';
+import { Github, Chrome, Apple, ShieldAlert, LogIn } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ROUTES } from '../config/routes';
@@ -10,8 +10,9 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  const { login } = useAuth();
+  const [oauthLoading, setOauthLoading] = useState<'github' | 'google' | 'apple' | null>(null);
+
+  const { login, loginWithOAuth } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || ROUTES.root;
@@ -102,14 +103,45 @@ const LoginPage: React.FC = () => {
             <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5"></div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-3 bg-black/40 border border-white/5 py-4 rounded-2xl hover:bg-white/5 transition-all group">
-              <Github size={20} className="text-gray-400 group-hover:text-white transition-colors" />
-              <span className="text-xs font-black uppercase text-gray-400 group-hover:text-white">GitHub</span>
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              type="button"
+              disabled={oauthLoading !== null}
+              onClick={async () => {
+                setError('');
+                setOauthLoading('github');
+                try { await loginWithOAuth('github'); } catch { setError('Falha ao iniciar login com GitHub.'); setOauthLoading(null); }
+              }}
+              className="flex items-center justify-center gap-2 bg-black/40 border border-white/5 py-4 rounded-2xl hover:bg-white/5 transition-all group disabled:opacity-50"
+            >
+              <Github size={18} className="text-gray-400 group-hover:text-white transition-colors" />
+              <span className="text-[10px] font-black uppercase text-gray-400 group-hover:text-white">{oauthLoading === 'github' ? '...' : 'GitHub'}</span>
             </button>
-            <button className="flex items-center justify-center gap-3 bg-black/40 border border-white/5 py-4 rounded-2xl hover:bg-white/5 transition-all group">
-              <Chrome size={20} className="text-gray-400 group-hover:text-white transition-colors" />
-              <span className="text-xs font-black uppercase text-gray-400 group-hover:text-white">Google</span>
+            <button
+              type="button"
+              disabled={oauthLoading !== null}
+              onClick={async () => {
+                setError('');
+                setOauthLoading('google');
+                try { await loginWithOAuth('google'); } catch { setError('Falha ao iniciar login com Google.'); setOauthLoading(null); }
+              }}
+              className="flex items-center justify-center gap-2 bg-black/40 border border-white/5 py-4 rounded-2xl hover:bg-white/5 transition-all group disabled:opacity-50"
+            >
+              <Chrome size={18} className="text-gray-400 group-hover:text-white transition-colors" />
+              <span className="text-[10px] font-black uppercase text-gray-400 group-hover:text-white">{oauthLoading === 'google' ? '...' : 'Google'}</span>
+            </button>
+            <button
+              type="button"
+              disabled={oauthLoading !== null}
+              onClick={async () => {
+                setError('');
+                setOauthLoading('apple');
+                try { await loginWithOAuth('apple'); } catch { setError('Falha ao iniciar login com Apple.'); setOauthLoading(null); }
+              }}
+              className="flex items-center justify-center gap-2 bg-black/40 border border-white/5 py-4 rounded-2xl hover:bg-white/5 transition-all group disabled:opacity-50"
+            >
+              <Apple size={18} className="text-gray-400 group-hover:text-white transition-colors" />
+              <span className="text-[10px] font-black uppercase text-gray-400 group-hover:text-white">{oauthLoading === 'apple' ? '...' : 'Apple'}</span>
             </button>
           </div>
 

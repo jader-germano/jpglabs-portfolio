@@ -15,6 +15,8 @@ import ProductDetailPage from './pages/ProductDetail';
 import PublicHomePage from './pages/PublicHome';
 import ServicesPage from './pages/Services';
 import DocsPage from './pages/Docs';
+import LoginPage from './pages/Login';
+import AuthCallbackPage from './pages/AuthCallback';
 
 const normalizeBasePath = (value: string): string => value.replace(/\/+$/, '');
 const AI_FRONTEND_BASE = normalizeBasePath(import.meta.env.VITE_AI_FRONTEND_URL ?? '/pi');
@@ -37,7 +39,8 @@ function AppRoutes() {
         <Layout>
           <Routes>
             <Route path={ROUTES.root} element={<PublicHomePage />} />
-            <Route path={ROUTES.login} element={<ExternalRedirect to={toAiFrontend('/login')} />} />
+            <Route path={ROUTES.login} element={<LoginPage />} />
+            <Route path={ROUTES.authCallback} element={<AuthCallbackPage />} />
             <Route path={ROUTES.offer} element={<OfferPage />} />
             <Route path={ROUTES.services} element={<ServicesPage />} />
             <Route path={ROUTES.downloads} element={<DownloadsPage />} />

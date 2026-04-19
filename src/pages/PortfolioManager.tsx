@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom';
 import { ROUTES } from '../config/routes';
 
 const PortfolioManager: React.FC = () => {
-  const { isPrimeOwner } = useAuth();
+  const { isRootAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<'projects' | 'experiences' | 'skills'>('projects');
   const tabs = [
     { id: 'projects', label: 'Projetos & Gigs', icon: Briefcase },
@@ -14,7 +14,7 @@ const PortfolioManager: React.FC = () => {
     { id: 'skills', label: 'Skills & Stack', icon: Wrench },
   ] as const;
 
-  if (!isPrimeOwner) {
+  if (!isRootAdmin) {
     return <Navigate to={ROUTES.root} replace />;
   }
 
