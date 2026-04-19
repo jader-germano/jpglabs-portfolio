@@ -1,0 +1,61 @@
+/* src/styles/tokens.css
+ * Cartesian Motion design system tokens
+ * Fonte canônica: prototypes/d8-cartesian-motion.html
+ */
+
+:root {
+  /* Surface layers — dark default */
+  --bg: #0d0d0d;
+  --bg-elev-1: #171717;
+  --bg-elev-2: #222222;
+  --bg-elev-3: #2c2c2c;
+
+  /* Typography */
+  --text: #f0f0f0;
+  --text-dim: #999999;
+  --text-faint: #505050;
+
+  /* Accent — red-pulled, distingue da Claude brand (#d77757) */
+  --accent: #c04a3f;
+  --accent-soft: rgba(192, 74, 63, 0.16);
+  --accent-deep: rgba(192, 74, 63, 0.38);
+  --accent-glow: rgba(192, 74, 63, 0.25);
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.1);
+
+  /* Semantic states */
+  --good: #4eba65;
+  --bad: #ff6b80;
+
+  /* Cartesian grid — base visual identity */
+  --grid-line: rgba(192, 74, 63, 0.08);
+  --grid-major: rgba(192, 74, 63, 0.18);
+  --axis: rgba(192, 74, 63, 0.4);
+
+  /* Typography stacks */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+
+  /* Motion */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+[data-theme='light'] {
+  --bg: #fafaf9;
+  --bg-elev-1: #f2f0ed;
+  --bg-elev-2: #e8e5e0;
+  --bg-elev-3: #dcd8d2;
+  --text: #171717;
+  --text-dim: #5a5550;
+  --text-faint: #928b82;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
+  --accent-soft: rgba(192, 74, 63, 0.12);
+  --grid-line: rgba(192, 74, 63, 0.12);
+  --grid-major: rgba(192, 74, 63, 0.28);
+  --axis: rgba(192, 74, 63, 0.55);
+}

@@ -1,13 +1,43 @@
+@import './styles/tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-family: var(--font-body);
+  }
+
   body {
-    @apply bg-dark-bg text-gray-100 font-sans antialiased;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'ss01', 'cv11';
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+  }
+
+  code, pre, kbd {
+    font-family: var(--font-mono);
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--text);
   }
 }
 
 .glass-panel {
-  @apply bg-[#161b22]/70 backdrop-blur-md border border-[#30363d] rounded-2xl;
+  background: rgba(23, 23, 23, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
 }
