@@ -45,27 +45,27 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#08090a] text-gray-300 font-sans selection:bg-blue-500/30 selection:text-white flex flex-col">
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_50%_-20%,rgba(0,112,243,0.15),transparent_70%)] pointer-events-none" />
+    <div className="min-h-screen bg-bg text-text font-sans selection:bg-accent/30 selection:text-text flex flex-col">
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_50%_-20%,color-mix(in_srgb,var(--accent)_15%,transparent),transparent_70%)] pointer-events-none" />
 
       {/* Main Navbar */}
-      <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#08090a]/60 backdrop-blur-xl">
+      <nav className="fixed top-0 w-full z-50 border-b border-border-subtle bg-bg/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           <Link to={ROUTES.root} className="flex items-center gap-3">
-            <div className="text-xl font-black tracking-tighter text-white">
-              JPG<span className="text-blue-500 font-black italic">LABS</span>
+            <div className="font-display text-xl font-black tracking-tight text-text">
+              JPG<span className="text-accent font-black italic">LABS</span>
             </div>
           </Link>
 
-          <div className="hidden xl:flex bg-white/5 rounded-full border border-white/10 p-1 overflow-x-auto max-w-full">
+          <div className="hidden xl:flex bg-white/5 rounded-full border border-border-subtle p-1 overflow-x-auto max-w-full">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 className={`px-4 py-1.5 rounded-full text-[10px] font-black transition-all uppercase tracking-widest flex items-center gap-2 whitespace-nowrap ${
                   isItemActive(item.path)
-                    ? 'bg-white/10 text-white shadow-sm'
-                    : 'text-gray-500 hover:text-gray-300'
+                    ? 'bg-white/10 text-text shadow-sm'
+                    : 'text-text-dim hover:text-accent transition-colors'
                 }`}
               >
                 <item.icon size={12} />
@@ -76,12 +76,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-full px-4 py-1.5">
+              <div className="flex items-center gap-3 bg-white/5 border border-border-subtle rounded-full px-4 py-1.5">
                 <div className="flex flex-col items-end">
-                  <span className="text-[9px] font-black uppercase text-white tracking-widest">
+                  <span className="text-[9px] font-black uppercase text-text tracking-widest">
                     {user?.name?.split(' ')[0]}
                   </span>
-                  <span className="text-[7px] font-bold uppercase text-blue-400 tracking-widest">
+                  <span className="text-[7px] font-bold uppercase text-accent tracking-widest">
                     {isRootAdmin ? 'PRIME OWNER' : user?.role}
                   </span>
                 </div>
@@ -95,7 +95,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             ) : (
               <Link
                 to={ROUTES.login}
-                className="px-5 py-2 bg-white/5 border border-white/10 text-white rounded-full text-[10px] font-black hover:bg-white/10 transition-all uppercase tracking-widest inline-flex items-center gap-2"
+                className="px-5 py-2 border border-border-subtle text-text-dim rounded-full text-[10px] font-black hover:border-accent hover:text-accent transition-colors uppercase tracking-widest inline-flex items-center gap-2"
               >
                 <UserIcon size={12} />
                 Entrar
@@ -103,7 +103,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             )}
             <a
               href="/pi"
-              className="px-5 py-2 bg-white text-black rounded-full text-[10px] font-black hover:bg-gray-200 transition-all uppercase tracking-widest inline-flex items-center gap-2"
+              className="px-5 py-2 border border-border-subtle text-text-dim rounded-full text-[10px] font-black hover:border-accent hover:text-accent transition-colors uppercase tracking-widest inline-flex items-center gap-2"
             >
               <Mic size={12} />
               Pi
@@ -141,8 +141,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <footer className="border-t border-white/5 py-16 text-center relative z-10 bg-black/20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col items-center mb-10">
-            <div className="text-3xl font-black tracking-tighter text-white mb-2 grayscale opacity-50">
-              JPG<span className="text-blue-500 font-black italic">LABS</span>
+            <div className="font-display text-3xl font-black tracking-tight text-text mb-2 grayscale opacity-50">
+              JPG<span className="text-accent font-black italic">LABS</span>
             </div>
             <p className="text-[9px] font-black uppercase text-gray-600 tracking-[0.4em]">Advanced AI Engineering & Systems</p>
           </div>

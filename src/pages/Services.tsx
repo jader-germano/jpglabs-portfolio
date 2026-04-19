@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Bot, Layers, ShieldCheck, Wrench, MessageCircle, Send } from 'lucide-react';
+import { CartesianBackground } from '../components/CartesianBackground';
 
 const CONTRACTOR_SERVICES = [
   {
@@ -52,81 +53,86 @@ const Services: React.FC = () => {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12 selection:bg-blue-500/30">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-20">
-        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500">Public Services</span>
-        <h1 className="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter mt-4 leading-[0.85]">
-          Company <br /><span className="text-gray-600 italic">Offerings</span>
-        </h1>
-        <p className="text-gray-500 text-lg mt-8 max-w-2xl leading-relaxed">
-          Pacotes de serviço desenhados para empresas e times técnicos que exigem operações de IA resilientes e arquitetura de alta performance.
-        </p>
-      </motion.div>
+    <>
+      <CartesianBackground intensity="focused" />
+      <div className="relative z-10">
+        <div className="max-w-7xl mx-auto px-6 py-12 selection:bg-accent/30">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-20">
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent">Public Services</span>
+            <h1 className="text-6xl md:text-8xl font-black font-display text-white uppercase tracking-tighter mt-4 leading-[0.85]">
+              Company <br /><span className="text-gray-600 italic">Offerings</span>
+            </h1>
+            <p className="text-gray-500 text-lg mt-8 max-w-2xl leading-relaxed">
+              Pacotes de serviço desenhados para empresas e times técnicos que exigem operações de IA resilientes e arquitetura de alta performance.
+            </p>
+          </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-24">
-        {CONTRACTOR_SERVICES.map((service) => (
-          <motion.article
-            key={service.id}
-            whileHover={{ y: -4 }}
-            className="rounded-[40px] border border-white/5 bg-[#111214]/80 p-10 backdrop-blur-sm group hover:border-blue-500/30 transition-all"
-          >
-            <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-500 mb-8 group-hover:bg-blue-500 group-hover:text-white transition-all">
-              <service.icon size={28} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-24">
+            {CONTRACTOR_SERVICES.map((service) => (
+              <motion.article
+                key={service.id}
+                whileHover={{ y: -4 }}
+                className="rounded-[40px] border border-white/5 bg-[#111214]/80 p-10 backdrop-blur-sm group hover:border-accent/30 transition-all"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-accent mb-8 group-hover:bg-accent group-hover:text-white transition-all">
+                  <service.icon size={28} />
+                </div>
+                <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-6">{service.title}</h2>
+                <p className="text-gray-400 text-sm leading-relaxed mb-8">{service.description}</p>
+                <ul className="grid grid-cols-1 gap-3">
+                  {service.bullets.map((bullet) => (
+                    <li key={bullet} className="flex items-center gap-3 text-[10px] text-gray-500 uppercase tracking-widest font-black">
+                      <div className="h-1 w-1 rounded-full bg-accent/50" />
+                      {bullet}
+                    </li>
+                  ))}
+                </ul>
+              </motion.article>
+            ))}
+          </div>
+
+          <section className="grid lg:grid-cols-[1fr_1.2fr] gap-12 bg-surface border border-white/5 rounded-[48px] overflow-hidden mb-24 shadow-2xl">
+            <div className="p-12 md:p-16 flex flex-col justify-center">
+              <div className="h-16 w-16 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500 mb-10">
+                <MessageCircle size={32} />
+              </div>
+              <h2 className="text-4xl font-black font-display uppercase tracking-tighter text-white mb-6">Inquire Services</h2>
+              <p className="text-gray-400 leading-relaxed mb-10">
+                Tem um projeto desafiador ou precisa de uma auditoria técnica? Entre em contato para discutirmos a melhor solução arquitetural para o seu negócio.
+              </p>
+              <div className="flex flex-col gap-4">
+                <a href="https://wa.me/5511999999999" className="flex items-center justify-between bg-[#25D366] text-black px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all">
+                  WhatsApp Profissional <ArrowUpRight size={18} />
+                </a>
+              </div>
             </div>
-            <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-6">{service.title}</h2>
-            <p className="text-gray-400 text-sm leading-relaxed mb-8">{service.description}</p>
-            <ul className="grid grid-cols-1 gap-3">
-              {service.bullets.map((bullet) => (
-                <li key={bullet} className="flex items-center gap-3 text-[10px] text-gray-500 uppercase tracking-widest font-black">
-                  <div className="h-1 w-1 rounded-full bg-blue-500/50" />
-                  {bullet}
-                </li>
-              ))}
-            </ul>
-          </motion.article>
-        ))}
+
+            <div className="bg-white/5 p-12 md:p-16 border-l border-white/5">
+              <form className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest ml-1">Nome</label>
+                    <input type="text" className="w-full bg-black/40 border border-white/5 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-accent transition-all" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest ml-1">E-mail</label>
+                    <input type="email" className="w-full bg-black/40 border border-white/5 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-accent transition-all" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest ml-1">Mensagem</label>
+                  <textarea rows={4} className="w-full bg-black/40 border border-white/5 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-accent transition-all resize-none" />
+                </div>
+                <button type="submit" className="w-full bg-white text-black font-black uppercase tracking-[0.2em] py-5 rounded-2xl hover:bg-gray-200 transition-all flex items-center justify-center gap-3">
+                  Enviar Proposta <Send size={16} />
+                </button>
+                <p className="text-[9px] text-gray-600 text-center uppercase tracking-widest">Ao enviar, você concorda com o tratamento de dados conforme nossa LGPD.</p>
+              </form>
+            </div>
+          </section>
+        </div>
       </div>
-
-      <section className="grid lg:grid-cols-[1fr_1.2fr] gap-12 bg-[#101215] border border-white/5 rounded-[48px] overflow-hidden mb-24 shadow-2xl">
-        <div className="p-12 md:p-16 flex flex-col justify-center">
-          <div className="h-16 w-16 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500 mb-10">
-            <MessageCircle size={32} />
-          </div>
-          <h2 className="text-4xl font-black uppercase tracking-tighter text-white mb-6">Inquire Services</h2>
-          <p className="text-gray-400 leading-relaxed mb-10">
-            Tem um projeto desafiador ou precisa de uma auditoria técnica? Entre em contato para discutirmos a melhor solução arquitetural para o seu negócio.
-          </p>
-          <div className="flex flex-col gap-4">
-            <a href="https://wa.me/5511999999999" className="flex items-center justify-between bg-[#25D366] text-black px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all">
-              WhatsApp Profissional <ArrowUpRight size={18} />
-            </a>
-          </div>
-        </div>
-        
-        <div className="bg-white/5 p-12 md:p-16 border-l border-white/5">
-          <form className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest ml-1">Nome</label>
-                <input type="text" className="w-full bg-black/40 border border-white/5 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-blue-500/50 transition-all" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest ml-1">E-mail</label>
-                <input type="email" className="w-full bg-black/40 border border-white/5 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-blue-500/50 transition-all" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest ml-1">Mensagem</label>
-              <textarea rows={4} className="w-full bg-black/40 border border-white/5 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-blue-500/50 transition-all resize-none" />
-            </div>
-            <button type="submit" className="w-full bg-white text-black font-black uppercase tracking-[0.2em] py-5 rounded-2xl hover:bg-gray-200 transition-all flex items-center justify-center gap-3">
-              Enviar Proposta <Send size={16} />
-            </button>
-            <p className="text-[9px] text-gray-600 text-center uppercase tracking-widest">Ao enviar, você concorda com o tratamento de dados conforme nossa LGPD.</p>
-          </form>
-        </div>
-      </section>
-    </div>
+    </>
   );
 };
 

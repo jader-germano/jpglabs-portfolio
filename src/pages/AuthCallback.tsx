@@ -42,18 +42,18 @@ const AuthCallbackPage: React.FC = () => {
   if (oauthError || timedOut) {
     const message = oauthError ?? 'Tempo esgotado ao conectar — tente novamente.';
     return (
-      <div className="min-h-screen bg-[#08090a] flex items-center justify-center px-6">
+      <div className="min-h-screen bg-bg flex items-center justify-center px-6">
         <div className="max-w-md w-full text-center space-y-5">
-          <div className="inline-block w-10 h-10 rounded-full border-2 border-red-500 flex items-center justify-center text-red-500 text-xl font-black">!</div>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">
+          <div className="inline-block w-10 h-10 rounded-full border-2 border-accent flex items-center justify-center text-accent text-xl font-black">!</div>
+          <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-text-dim">
             Falha na autenticação
           </p>
-          <p className="text-sm text-gray-300 leading-relaxed break-words">
+          <p className="text-sm text-text-dim leading-relaxed break-words">
             {decodeURIComponent(message.replace(/\+/g, ' '))}
           </p>
           <button
             onClick={() => navigate(ROUTES.login, { replace: true })}
-            className="mt-4 bg-white text-black px-6 py-2 rounded font-bold text-xs tracking-wider uppercase hover:bg-gray-200 transition-colors"
+            className="mt-4 bg-accent text-white px-6 py-2 rounded font-bold text-xs tracking-wider uppercase hover:bg-accent-deep transition-colors"
           >
             Voltar ao login
           </button>
@@ -63,10 +63,10 @@ const AuthCallbackPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#08090a] flex items-center justify-center">
+    <div className="min-h-screen bg-bg flex items-center justify-center">
       <div className="text-center space-y-3">
-        <div className="inline-block w-10 h-10 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">
+        <div className="inline-block w-10 h-10 border-2 border-border-subtle border-t-accent rounded-full animate-spin" />
+        <p className="text-[10px] font-black font-mono uppercase tracking-[0.3em] text-text-faint">
           Conectando sua sessão…
         </p>
       </div>
