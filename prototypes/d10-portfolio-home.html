@@ -750,7 +750,9 @@
       const dy = (pos.y - cy) * -0.03;
       const px = (pos.x - cx) / window.innerWidth;
       const py = (pos.y - cy) / window.innerHeight;
-      const tilt = BASE_TILT + px * TILT_X_AMP - py * TILT_Y_AMP;
+      // Tilt OPOSTO à direção do mouse (não segue) — match d8 intent:
+      // mouse pra direita → plano rotaciona anti-horário (tilt diminui)
+      const tilt = BASE_TILT - px * TILT_X_AMP + py * TILT_Y_AMP;
       grid.style.transform = `translate(${dx}px, ${dy}px) rotate(${tilt}deg)`;
 
       // Coord label (x, y) seguindo cursor — origem no centro do viewport, y invertido
