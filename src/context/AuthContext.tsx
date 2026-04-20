@@ -8,7 +8,7 @@ import type { User } from '../types';
 const SESSION_DURATION_MS = 5 * 60 * 1000; // 5-minute activity window
 const WARNING_THRESHOLD_MS = 10 * 1000;    // show warning 10s before expiry
 const PI_HANDOFF_KEY = 'jpglabs_pi_handoff_token';
-const PORTFOLIO_API_BASE = import.meta.env.VITE_PORTFOLIO_API_URL ?? 'http://localhost:8787';
+const HUB_URL = import.meta.env.VITE_HUB_URL ?? 'http://localhost:8787';
 // (kept for legacy handoff use; no longer referenced after OAuth callback migration)
 // const AI_FRONTEND_BASE = import.meta.env.VITE_AI_FRONTEND_URL ?? 'http://localhost:3000';
 
@@ -159,7 +159,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // USER with no profile = pending approval
             setIsPending(true);
             // Notify backend to create/confirm PENDING row
-            fetch(`${PORTFOLIO_API_BASE}/api/auth/request-access`, {
+            fetch(`${HUB_URL}/api/auth/request-access`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email: u.email, provider: 'oauth' }),
