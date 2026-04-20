@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -16,6 +19,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@jpglabs/cartesian-red": "workspace:*",
     "@supabase/supabase-js": "^2.103.3",
     "clsx": "^2.1.1",
     "framer-motion": "^12.35.1",
