@@ -252,14 +252,13 @@
         animation-play-state: paused;
       }
     }
-    .grid-axes {
-      position: absolute; inset: 0; pointer-events: none;
+    /* Eixos como pseudos do grid-layer → tiltam juntos com o grid (d8 behavior) */
+    .grid-layer::before,
+    .grid-layer::after {
+      content: ''; position: absolute; background: var(--axis); pointer-events: none; z-index: 2;
     }
-    .grid-axes::before, .grid-axes::after {
-      content: ''; position: absolute; background: var(--axis);
-    }
-    .grid-axes::before { left: 50%; top: 0; bottom: 0; width: 1px; transform: translateX(-50%); }
-    .grid-axes::after { top: 50%; left: 0; right: 0; height: 1px; transform: translateY(-50%); }
+    .grid-layer::before { left: 50%; top: 0; bottom: 0; width: 1px; transform: translateX(-50%); }
+    .grid-layer::after  { top: 50%; left: 0; right: 0; height: 1px; transform: translateY(-50%); }
 
     /* Desktop top nav */
     .desktop-nav {
@@ -585,7 +584,6 @@
           <div class="egg" data-cx="-20" data-cy="-11"><span class="egg-tip">(−20, −11) · JPG Labs OS · 2025→</span></div>
           <div class="egg" data-cx="18" data-cy="-13"><span class="egg-tip">(18, −13) · TSE eleitoral · 2024→</span></div>
         </div>
-        <div class="grid-axes"></div>
 
         <nav class="desktop-nav">
           <div>
@@ -642,7 +640,6 @@
       <div class="device-label">Mobile · 375×812 · <span class="accent-text">V3 Command Palette ⌘K</span> via FAB</div>
       <div class="viewport-mobile" data-viewport="mobile">
         <div class="grid-layer" id="grid-mobile" style="background-size: 32px 32px, 32px 32px, 128px 128px, 128px 128px;"></div>
-        <div class="grid-axes"></div>
 
         <div class="mobile-statusbar">9:41</div>
         <nav class="mobile-nav">
