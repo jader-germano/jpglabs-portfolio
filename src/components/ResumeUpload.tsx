@@ -5,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { type Portfolio } from "../lib/portfolio-schema";
 import { useLanguage } from "../context/LanguageProvider";
 import { portfolioApiBaseUrl } from "../lib/portfolio-api";
+import { fetchWithAuth } from "../lib/fetch-with-auth";
 
 export default function ResumeUpload() {
   const { dictionary } = useLanguage();
@@ -40,7 +41,7 @@ export default function ResumeUpload() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch(`${portfolioApiBaseUrl}/api/resume/parse`, {
+      const response = await fetchWithAuth(`${portfolioApiBaseUrl}/api/resume/parse`, {
         method: "POST",
         body: formData,
       });
