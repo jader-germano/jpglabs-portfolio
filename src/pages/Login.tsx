@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <>
-      <CartesianBackground intensity="accent" />
+      <CartesianBackground intensity="ambient" />
       <div className="relative z-10 min-h-screen flex items-center justify-center px-6 selection:bg-accent/30">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

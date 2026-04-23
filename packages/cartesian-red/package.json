@@ -1,0 +1,27 @@
+{
+  "name": "@jpglabs/cartesian-red",
+  "version": "0.1.0",
+  "description": "Cartesian Red Design System — tokens and motion primitives for JPGLabs ecosystem",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./motion": "./src/motion.ts",
+    "./tokens": "./src/tokens.ts"
+  },
+  "files": [
+    "src",
+    "dist",
+    "tokens.css",
+    "README.md"
+  ],
+  "keywords": [
+    "design-system",
+    "jpglabs",
+    "cartesian",
+    "tokens",
+    "motion"
+  ],
+  "license": "UNLICENSED",
+  "private": true
+}

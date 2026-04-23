@@ -54,7 +54,7 @@ const Services: React.FC = () => {
 
   return (
     <>
-      <CartesianBackground intensity="focused" />
+      <CartesianBackground intensity="ambient" />
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-6 py-12 selection:bg-accent/30">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-20">

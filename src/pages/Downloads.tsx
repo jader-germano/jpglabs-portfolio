@@ -12,7 +12,7 @@ const Downloads: React.FC = () => {
 
   return (
     <>
-      <CartesianBackground intensity="focused" />
+      <CartesianBackground intensity="ambient" />
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="mb-12">

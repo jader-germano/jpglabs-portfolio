@@ -37,7 +37,7 @@ const DocsPage: React.FC = () => {
 
   return (
     <>
-      <CartesianBackground intensity="focused" />
+      <CartesianBackground intensity="ambient" />
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-6 py-20 selection:bg-orange-500/30">
 

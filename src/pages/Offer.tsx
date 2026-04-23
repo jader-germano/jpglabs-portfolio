@@ -8,7 +8,7 @@ const Offer: React.FC = () => {
 
   return (
     <>
-      <CartesianBackground intensity="focused" />
+      <CartesianBackground intensity="ambient" />
       <div className="relative z-10">
         <div className="min-h-screen bg-[#08090a] text-gray-100 selection:bg-accent/30 pb-20 overflow-x-hidden">
           <main className="pt-20 max-w-5xl mx-auto px-6">
