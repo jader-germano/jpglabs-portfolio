@@ -9,6 +9,17 @@ const SESSION_DURATION_MS = 5 * 60 * 1000; // 5-minute activity window
 const WARNING_THRESHOLD_MS = 10 * 1000;    // show warning 10s before expiry
 const PI_HANDOFF_KEY = 'jpglabs_pi_handoff_token';
 const HUB_URL = import.meta.env.VITE_HUB_URL ?? 'http://localhost:8787';
+
+// AUTH_BYPASS: temporary deploy-time flag to unblock functionality testing.
+// When VITE_AUTH_BYPASS === 'true', inject a synthetic ROOT_ADMIN user so all
+// ProtectedRoute guards and role-gated features behave as if logged in.
+const AUTH_BYPASS = import.meta.env.VITE_AUTH_BYPASS === 'true';
+const BYPASS_USER: User = {
+  id: 'auth-bypass-admin',
+  email: 'bypass@jpglabs.local',
+  name: 'Bypass Admin',
+  role: 'ROOT_ADMIN',
+};
 // (kept for legacy handoff use; no longer referenced after OAuth callback migration)
 // const AI_FRONTEND_BASE = import.meta.env.VITE_AI_FRONTEND_URL ?? 'http://localhost:3000';
 
@@ -96,9 +107,9 @@ async function loadUserFromSession(session: Session): Promise<User> {
 
 // ── Provider ──────────────────────────────────────────────────────────────────
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(AUTH_BYPASS ? BYPASS_USER : null);
   const [isPending, setIsPending] = useState(false);
-  const [expiry, setExpiry] = useState<number | null>(null);
+  const [expiry, setExpiry] = useState<number | null>(AUTH_BYPASS ? Date.now() + SESSION_DURATION_MS : null);
   const [sessionTimeRemaining, setSessionTimeRemaining] = useState(SESSION_DURATION_MS);
   const [showSessionWarning, setShowSessionWarning] = useState(false);
   const timerRef = useRef<number | null>(null);
@@ -150,6 +161,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ── Auth state subscription ───────────────────────────────────────────────
   useEffect(() => {
+    if (AUTH_BYPASS) return; // Skip supabase wiring entirely in bypass mode
     // Initial session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
