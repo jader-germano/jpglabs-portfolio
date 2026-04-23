@@ -1,73 +1,51 @@
-# React + TypeScript + Vite
+# jpglabs-portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> **Stack:** React 19 + Vite 7 + Tailwind 4 + React Router 7 · SPA · dev port 5173 · prod serve via nginx :80
+> **Role in workspace:** canonical **frontend** repo da JPGLabs. Heroes e páginas públicas + áreas logadas vivem aqui como SPA React + Vite.
 
-Currently, two official plugins are available:
+## Intenção arquitetural (2026-04-23)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Este é o **único** repo frontend ativo do stack JPGLabs. Padrão escolhido: **React + Vite** — não Next.js. Qualquer página, hero ou componente usado em produção deve viver aqui.
 
-## React Compiler
+Duplicações atuais em `portfolio-backend/components/` serão migradas pra cá; o `portfolio-backend` fica **só com responsabilidade de backend** (Next.js hoje → NestJS no futuro).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `jpglabs-dashboard` (Next.js) fica fora da consolidação por enquanto — migração dele (Next → NestJS + React/Angular) é o último passo.
 
-## Expanding the ESLint configuration
+## Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Runtime: Node 20
+- Bundler: Vite 7.3.1
+- UI: React 19 + React Router 7
+- Estilo: Tailwind 4 (`@tailwindcss/vite`)
+- Auth/data: Supabase client + Context API (`src/context/AuthContext.tsx`)
+- Testes: Vitest + Testing Library
+- Design system: workspace package `@jpglabs/cartesian-red` (tokens + motion)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Páginas (hoje)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+`src/pages/`: Home, Services, ServiceDetail, ProductDetail, Hub, Instances, Guardian, Downloads, Docs, Portfolio, PortfolioManager, Login, AuthCallback, Offer, Terms, Privacy. Guardas em `src/components/ProtectedRoute.tsx` + `src/context/AuthContext.tsx`.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Scripts
+
+```bash
+npm run dev        # vite dev server (5173)
+npm run build      # tsc -b && vite build → dist/
+npm run preview    # vite preview
+npm test           # vitest run
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## AUTH_BYPASS (deploy-time)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+`VITE_AUTH_BYPASS=true` no build injeta um `ROOT_ADMIN` sintético em `AuthContext` e desliga a assinatura Supabase — uso restrito a testes de funcionalidade. Default (unset/false) preserva auth real. Ver `src/context/AuthContext.tsx` e MR !2 (branch `feat/shared-auth-realm-s1a`).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Deploy
+
+- Alvo: VPS (k3s namespace `prod`), imagem provisória `portfolio-v2:latest` (nome será padronizado para `jpglabs-portfolio:*` pós-consolidação)
+- Ingress: Traefik → Cloudflare Tunnel → `jpglabs.com.br`
+
+## Consolidação em andamento
+
+Documentos canônicos:
+- `docs/presentations/arch-local-vs-vps-2026-04-23.md` (arquitetura local + VPS)
+- `FrankMD/notes/history/april-2026/auth-bypass-k3s-cleanup-round.md` (handoff)
+- Contexto fino: `docs/projects/jpglabs-portfolio/`
