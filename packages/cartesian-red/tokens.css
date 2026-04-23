@@ -1,0 +1,112 @@
+/*
+ * @jpglabs/cartesian-red — canonical design tokens (v0.1.0)
+ *
+ * Source of truth for the JPGLabs ecosystem: portfolio, Axis hub,
+ * future surfaces. Valores derivados de d8-cartesian-motion.html
+ * (referência visual definitiva) com intensidade da paleta calibrada
+ * em 2026-04-20.
+ *
+ * Consumidores:
+ *   - /src/styles/tokens.css (thin facade re-importando este arquivo)
+ *   - prototypes/d8, d9, d10, dN (futuros)
+ *   - Axis hub (openclaude-hub) quando migrar
+ *
+ * Figma mirror: jpglabs DS — Cartesian Red (update via Tokens Studio plugin)
+ *
+ * NUNCA editar valores aqui sem PR review — tokens canônicos.
+ */
+
+:root {
+  /* ============================================================
+   * DS TOKENS — theme-independent
+   * Accent, typography e motion são estáveis entre dark/light.
+   * ============================================================ */
+
+  /* Accent — Cartesian Red */
+  --accent: #c04a3f;
+
+  /* Typography stacks */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+
+  /* Motion easing */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  /* Semantic states */
+  --good: #4eba65;
+  --bad: #ff6b80;
+}
+
+/* ============================================================
+ * DARK THEME — canonical default
+ * ============================================================ */
+:root,
+:root[data-theme="dark"] {
+  /* Surface */
+  --bg: #0d0d0d;
+  --bg-elev-1: #171717;
+  --bg-elev-2: #222222;
+  --bg-elev-3: #2c2c2c;
+
+  /* Text */
+  --text: #f0f0f0;
+  --text-dim: #999999;
+  --text-faint: #505050;
+
+  /* Accent halos */
+  --accent-soft: rgba(192, 74, 63, 0.16);
+  --accent-deep: rgba(192, 74, 63, 0.38);
+  --accent-glow: rgba(192, 74, 63, 0.25);
+
+  /* Border */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.1);
+
+  /* Cartesian grid — visual identity (d8 canonical) */
+  --grid-line: rgba(192, 74, 63, 0.08);
+  --grid-major: rgba(192, 74, 63, 0.18);
+  --axis: rgba(192, 74, 63, 0.4);
+
+  /* Glass surfaces + device bezel (DS tokens pros mocks) */
+  --surface-overlay: rgba(13, 13, 13, 0.72);
+  --device-bezel: #1a1a1a;
+  --viewport-shadow: rgba(0, 0, 0, 0.6);
+}
+
+/* ============================================================
+ * LIGHT THEME — canonical
+ * Superfícies invertidas em bege quente; accent estável. Contraste AA.
+ * ============================================================ */
+:root[data-theme="light"] {
+  /* Surface */
+  --bg: #fafaf9;
+  --bg-elev-1: #f2f0ed;
+  --bg-elev-2: #e8e5e0;
+  --bg-elev-3: #dcd8d2;
+
+  /* Text */
+  --text: #171717;
+  --text-dim: #5a5550;
+  --text-faint: #928b82;
+
+  /* Accent halos */
+  --accent-soft: rgba(192, 74, 63, 0.12);
+  --accent-deep: rgba(192, 74, 63, 0.38);
+  --accent-glow: rgba(192, 74, 63, 0.22);
+
+  /* Border */
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
+
+  /* Cartesian grid — visual identity (d8 canonical, light variant) */
+  --grid-line: rgba(192, 74, 63, 0.12);
+  --grid-major: rgba(192, 74, 63, 0.28);
+  --axis: rgba(192, 74, 63, 0.55);
+
+  /* Glass surfaces + device bezel (DS tokens) */
+  --surface-overlay: rgba(250, 250, 249, 0.78);
+  --device-bezel: #d8d8d8;
+  --viewport-shadow: rgba(0, 0, 0, 0.18);
+}

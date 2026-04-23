@@ -1,0 +1,12 @@
+/* src/styles/tokens.css — thin facade
+ *
+ * A fonte canônica dos tokens vive em @jpglabs/cartesian-red/tokens.css.
+ * Qualquer ajuste de paleta, typography, grid intensity ou easing deve
+ * ser feito lá (packages/cartesian-red/tokens.css) e propaga automático
+ * pelo workspace.
+ *
+ * Motivo: single source of truth cross-ecosystem (portfolio + Axis hub
+ * + futuros). Ver CHANGELOG do package pra histórico de mudanças.
+ */
+
+@import '@jpglabs/cartesian-red/tokens.css';

@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>D9 · Cartesian Red Showcase — DS Motion Reference</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,400..800&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      /* ============================================================
+       * DS TOKENS — theme-independent (canonical for @jpglabs/cartesian-red)
+       * These values don't change between dark/light. Accent, typography
+       * stack and motion easing are stable across themes.
+       * ============================================================ */
+
+      /* Accent — Cartesian Red (stable across themes) */
+      --accent: #c04a3f;
+
+      /* Typography */
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+
+      /* Motion easing (DS default) */
+      --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* ============================================================
+     * DARK THEME — canonical for @jpglabs/cartesian-red (default)
+     * ============================================================ */
+    :root,
+    :root[data-theme="dark"] {
+      /* Surface */
+      --bg: #0d0d0d;
+      --bg-elev-1: #171717;
+      --bg-elev-2: #222;
+      --bg-elev-3: #2c2c2c;
+
+      /* Text */
+      --text: #f0f0f0;
+      --text-dim: #999;
+      --text-faint: #505050;
+
+      /* Accent halos */
+      --accent-soft: rgba(192, 74, 63, 0.16);
+      --accent-deep: rgba(192, 74, 63, 0.38);
+      --accent-glow: rgba(192, 74, 63, 0.25);
+
+      /* Border */
+      --border: rgba(255, 255, 255, 0.06);
+      --border-strong: rgba(255, 255, 255, 0.1);
+
+      /* Glass surfaces + device bezel (DS tokens — used pelos mocks) */
+      --surface-overlay: rgba(13, 13, 13, 0.72);
+      --device-bezel: #1a1a1a;
+      --viewport-shadow: rgba(0, 0, 0, 0.6);
+
+      /* ----------------------------------------------------------------
+       * SHOWCASE-ONLY — NOT DS primitives
+       * Cartesian canvas (grid, axes) — decorative, NÃO shipa em produto.
+       * ---------------------------------------------------------------- */
+      --grid-line: rgba(192, 74, 63, 0.08);
+      --grid-major: rgba(192, 74, 63, 0.18);
+      --axis: rgba(192, 74, 63, 0.4);
+    }
+
+    /* ============================================================
+     * LIGHT THEME — canonical for @jpglabs/cartesian-red
+     * Superfícies invertidas + texto escuro. O accent (#c04a3f) é o
+     * mesmo — contraste AA em ambas polaridades. Grid/axes com alpha
+     * maior pra manter legibilidade em fundo claro.
+     * ============================================================ */
+    :root[data-theme="light"] {
+      /* Surface */
+      --bg: #fafafa;
+      --bg-elev-1: #f1f1f1;
+      --bg-elev-2: #e8e8e8;
+      --bg-elev-3: #dedede;
+
+      /* Text */
+      --text: #0d0d0d;
+      --text-dim: #555;
+      --text-faint: #9a9a9a;
+
+      /* Accent halos */
+      --accent-soft: rgba(192, 74, 63, 0.1);
+      --accent-deep: rgba(192, 74, 63, 0.38);
+      --accent-glow: rgba(192, 74, 63, 0.22);
+
+      /* Border */
+      --border: rgba(0, 0, 0, 0.08);
+      --border-strong: rgba(0, 0, 0, 0.14);
+
+      /* Glass surfaces + device bezel (DS tokens) */
+      --surface-overlay: rgba(250, 250, 250, 0.78);
+      --device-bezel: #d8d8d8;
+      --viewport-shadow: rgba(0, 0, 0, 0.18);
+
+      /* ----------------------------------------------------------------
+       * SHOWCASE-ONLY — NOT DS primitives (light-tuned)
+       * ---------------------------------------------------------------- */
+      --grid-line: rgba(192, 74, 63, 0.12);
+      --grid-major: rgba(192, 74, 63, 0.26);
+      --axis: rgba(192, 74, 63, 0.55);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--bg); color: var(--text); font-family: var(--font-body); }
+    body { min-height: 100vh; cursor: none; overflow-x: hidden; }
+
+    /* Cursor orb — pointer-events none, fixed, interpolated via rAF */
+    .cursor-orb {
+      position: fixed; width: 18px; height: 18px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+      box-shadow: 0 0 24px 6px var(--accent-glow);
+      pointer-events: none; z-index: 9999; will-change: transform;
+      transform: translate(-50%, -50%); top: 0; left: 0;
+    }
+    .cursor-orb::after {
+      content: ''; position: absolute; inset: -12px;
+      border: 1px solid var(--accent-deep); border-radius: 50%;
+      opacity: 0.4;
+    }
+
+    /* Page scaffold */
+    .page-head {
+      padding: 40px 48px 24px; display: flex; justify-content: space-between; align-items: baseline;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text-faint);
+    }
+    .page-head h1 { font-family: var(--font-display); font-size: 24px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; text-transform: none; }
+    .page-head .tag { color: var(--accent); }
+    .page-head .head-right { display: flex; align-items: center; gap: 18px; }
+    .theme-toggle {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--text-dim); background: transparent; border: 1px solid var(--border-strong);
+      padding: 6px 12px; border-radius: 999px; cursor: none;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: border-color 200ms var(--ease-out-quart), color 200ms var(--ease-out-quart);
+    }
+    .theme-toggle:hover { border-color: var(--accent-deep); color: var(--accent); }
+    .theme-toggle .glyph { font-size: 12px; }
+
+    .device-grid {
+      padding: 48px;
+      display: grid; gap: 48px;
+      grid-template-columns: minmax(0, 1fr) 420px;
+      align-items: start;
+    }
+    @media (max-width: 1200px) {
+      .device-grid { grid-template-columns: 1fr; }
+    }
+
+    .device { display: flex; flex-direction: column; gap: 12px; }
+    .device-label {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--text-faint);
+    }
+    .device-label .accent-text { color: var(--accent); }
+
+    /* Desktop viewport — fluid width, 2:1 aspect */
+    .viewport-desktop {
+      position: relative; aspect-ratio: 16 / 10; border: 1px solid var(--border-strong);
+      border-radius: 12px; overflow: hidden; background: var(--bg);
+      box-shadow: 0 32px 96px -24px var(--viewport-shadow);
+    }
+
+    /* Mobile viewport — iPhone-ish frame */
+    .viewport-mobile {
+      position: relative; width: 360px; height: 780px; margin: 0 auto;
+      border: 10px solid var(--device-bezel); border-radius: 42px; overflow: hidden;
+      background: var(--bg); box-shadow: 0 32px 96px -24px var(--viewport-shadow);
+    }
+    .viewport-mobile::before {
+      content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 30px; background: var(--device-bezel); border-radius: 0 0 20px 20px; z-index: 20;
+    }
+
+    /* Cartesian grid — SVG layered inside viewport, driven by CSS vars */
+    .grid-layer {
+      position: absolute; inset: -15%; width: 130%; height: 130%;
+      background-image:
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to right, var(--grid-major) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-major) 1px, transparent 1px);
+      background-size: 48px 48px, 48px 48px, 192px 192px, 192px 192px;
+      will-change: transform;
+      transform-origin: center;
+    }
+
+    /* Coordinate label beside the cursor — cartesian (x, y) in grid units */
+    .coord-label {
+      position: fixed; top: 0; left: 0; z-index: 9998;
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+      color: var(--accent); padding: 4px 9px; border-radius: 5px;
+      background: var(--surface-overlay); border: 1px solid var(--accent-deep);
+      backdrop-filter: blur(6px); pointer-events: none;
+      will-change: transform; opacity: 0;
+      transition: opacity 200ms var(--ease-out-quart);
+    }
+    .coord-label.visible { opacity: 1; }
+
+    /* Easter egg hotspots — plotted at specific cartesian coordinates */
+    .egg {
+      position: absolute; width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 14px var(--accent-glow);
+      transform: translate(-50%, -50%); cursor: none; pointer-events: auto; z-index: 7;
+      animation: egg-pulse 2.6s ease-in-out infinite;
+      transition: transform 200ms var(--ease-out-quart);
+    }
+    .egg::before {
+      content: ''; position: absolute; inset: -7px; border-radius: 50%;
+      border: 1px solid var(--accent-deep);
+      animation: egg-ring 2.6s ease-in-out infinite;
+    }
+    .egg:hover { transform: translate(-50%, -50%) scale(1.35); }
+    .egg-tip {
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em;
+      background: var(--bg-elev-2); color: var(--text);
+      padding: 6px 10px; border-radius: 6px; border: 1px solid var(--accent-deep);
+      white-space: nowrap; pointer-events: none; opacity: 0;
+      transition: opacity 200ms var(--ease-out-quart);
+    }
+    .egg:hover .egg-tip { opacity: 1; }
+    @keyframes egg-pulse {
+      0%, 100% { box-shadow: 0 0 14px var(--accent-glow); }
+      50% { box-shadow: 0 0 28px var(--accent-deep); }
+    }
+    @keyframes egg-ring {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.4); opacity: 0.1; }
+    }
+
+    /* Motif SVG overlay — origin rings + orbit + trajectory + leading dot */
+    .motif-svg {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      pointer-events: none; overflow: visible; z-index: 3;
+    }
+    .origin-core { filter: drop-shadow(0 0 8px var(--accent-glow)); }
+    .orbit-dot { filter: drop-shadow(0 0 6px var(--accent-glow)); }
+    .leading-dot { filter: drop-shadow(0 0 10px var(--accent-glow)); }
+    @media (prefers-reduced-motion: reduce) {
+      .motif-svg animate, .motif-svg animateTransform, .motif-svg animateMotion {
+        animation-play-state: paused;
+      }
+    }
+    /* Eixos como pseudos do grid-layer → tiltam juntos com o grid (d8 behavior) */
+    .grid-layer::before,
+    .grid-layer::after {
+      content: ''; position: absolute; background: var(--axis); pointer-events: none; z-index: 2;
+    }
+    .grid-layer::before { left: 50%; top: 0; bottom: 0; width: 1px; transform: translateX(-50%); }
+    .grid-layer::after  { top: 50%; left: 0; right: 0; height: 1px; transform: translateY(-50%); }
+
+    /* Desktop top nav */
+    .desktop-nav {
+      position: absolute; top: 0; left: 0; right: 0; height: 56px; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; border-bottom: 1px solid var(--border);
+      background: var(--surface-overlay); backdrop-filter: blur(12px);
+    }
+    .nav-brand { font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+    .nav-brand em { color: var(--accent); font-style: italic; font-weight: 900; }
+    .nav-tag { margin-left: 12px; font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); text-transform: lowercase; }
+    .nav-links { display: flex; gap: 28px; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); text-transform: lowercase; letter-spacing: 0.08em; }
+    .nav-links a { color: inherit; text-decoration: none; transition: color 200ms var(--ease-out-quart); }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+    .nav-theme { color: var(--text-dim); font-size: 14px; cursor: none; }
+
+    /* Hero area (desktop) */
+    .hero-desktop {
+      position: absolute; left: 0; right: 340px; top: 56px; bottom: 0; padding: 72px 56px;
+      display: flex; flex-direction: column; justify-content: center; gap: 24px; z-index: 5;
+    }
+    .hero-kicker {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.3em; color: var(--accent);
+    }
+    .hero-title {
+      font-family: var(--font-display); font-weight: 300; line-height: 0.92; letter-spacing: -0.03em;
+      font-size: clamp(48px, 7vw, 104px);
+    }
+    .hero-title em { font-style: italic; color: var(--text-dim); font-weight: 400; }
+    .hero-lead {
+      font-size: 16px; line-height: 1.6; color: var(--text-dim); max-width: 520px;
+    }
+    .hero-actions { display: flex; gap: 12px; margin-top: 16px; }
+    .btn {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em;
+      padding: 14px 24px; border-radius: 10px; cursor: none; transition: all 200ms var(--ease-out-quart);
+      border: 1px solid transparent; text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #d05a4f; transform: translateY(-1px); box-shadow: 0 8px 24px -8px var(--accent-glow); }
+    .btn-ghost { border-color: var(--border-strong); color: var(--text-dim); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Axis V1 Right Drawer */
+    .drawer-v1 {
+      position: absolute; top: 56px; bottom: 0; right: 0; width: 340px;
+      background: linear-gradient(180deg, var(--bg-elev-1) 0%, var(--bg) 100%);
+      border-left: 1px solid var(--border); z-index: 6;
+      display: flex; flex-direction: column; padding: 24px 20px;
+    }
+    .drawer-kicker {
+      font-family: var(--font-mono); font-size: 9px; text-transform: uppercase;
+      letter-spacing: 0.24em; color: var(--accent); margin-bottom: 6px;
+    }
+    .drawer-title {
+      font-family: var(--font-display); font-size: 22px; font-weight: 500; line-height: 1.1;
+      letter-spacing: -0.01em; margin-bottom: 10px;
+    }
+    .drawer-desc {
+      font-size: 12px; line-height: 1.5; color: var(--text-dim); margin-bottom: 24px;
+    }
+    .realm-card {
+      display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 10px;
+      background: var(--bg-elev-2); border: 1px solid var(--border); margin-bottom: 8px;
+      font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
+      transition: border-color 300ms var(--ease-out-quart), background 300ms var(--ease-out-quart);
+    }
+    .realm-card:hover { border-color: var(--accent-deep); background: var(--bg-elev-3); }
+    .realm-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--good);
+      box-shadow: 0 0 8px var(--good);
+    }
+    .realm-dot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+    .drawer-messages {
+      flex: 1; display: flex; flex-direction: column; gap: 16px; margin-top: 24px;
+      padding-top: 20px; border-top: 1px solid var(--border);
+    }
+    .msg {
+      font-family: var(--font-mono); font-size: 11px; line-height: 1.6; color: var(--text);
+    }
+    .msg .role {
+      display: inline-block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em;
+      color: var(--accent); margin-bottom: 4px;
+    }
+    .msg.user .role { color: var(--text-faint); }
+    .drawer-input {
+      margin-top: auto; padding: 14px 16px; border-radius: 12px;
+      background: var(--bg-elev-2); border: 1px solid var(--border); display: flex; align-items: center; gap: 10px;
+      font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
+      transition: border-color 200ms;
+    }
+    .drawer-input:focus-within, .drawer-input:hover { border-color: var(--accent-deep); }
+    .drawer-input input {
+      flex: 1; background: transparent; border: 0; outline: 0; color: var(--text);
+      font-family: inherit; font-size: inherit;
+    }
+    .drawer-send {
+      width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+
+    /* --- Mobile --- */
+    .mobile-statusbar {
+      position: absolute; top: 0; left: 0; right: 0; height: 40px; z-index: 30;
+      display: flex; align-items: center; justify-content: center; padding-top: 12px;
+      font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    }
+    .mobile-nav {
+      position: absolute; top: 40px; left: 0; right: 0; height: 48px; z-index: 20;
+      display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+    }
+    .mobile-hero {
+      position: absolute; top: 120px; left: 24px; right: 24px; z-index: 5;
+    }
+    .mobile-hero .hero-kicker { font-size: 9px; letter-spacing: 0.25em; }
+    .mobile-hero .hero-title { font-size: 56px; line-height: 0.9; margin-top: 10px; }
+    .mobile-hero .hero-lead { font-size: 13px; margin-top: 16px; max-width: none; }
+    .mobile-cards {
+      position: absolute; left: 24px; right: 24px; top: 460px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .proj-card {
+      padding: 14px 16px; border-radius: 12px; background: var(--bg-elev-1);
+      border: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px;
+      transition: all 300ms var(--ease-out-quart);
+    }
+    .proj-card:hover { border-color: var(--accent-deep); background: var(--bg-elev-2); transform: translateX(2px); }
+    .proj-card .period {
+      font-family: var(--font-mono); font-size: 9px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase;
+    }
+    .proj-card .title { font-size: 14px; font-weight: 500; }
+    .proj-card .company { font-size: 11px; color: var(--text-dim); }
+
+    /* Command palette (V3) trigger FAB + overlay */
+    .fab {
+      position: absolute; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%;
+      background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-weight: 600; font-size: 12px; cursor: none;
+      box-shadow: 0 8px 32px -8px var(--accent-glow), 0 4px 12px rgba(0, 0, 0, 0.4);
+      z-index: 25; animation: fab-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes fab-pulse {
+      0%, 100% { box-shadow: 0 8px 32px -8px var(--accent-glow), 0 4px 12px rgba(0, 0, 0, 0.4); }
+      50% { box-shadow: 0 8px 48px 0 var(--accent-glow), 0 4px 12px rgba(0, 0, 0, 0.4); }
+    }
+    .palette-overlay {
+      position: absolute; inset: 0; background: var(--surface-overlay); backdrop-filter: blur(8px);
+      display: none; align-items: flex-start; justify-content: center; padding-top: 140px; z-index: 40;
+    }
+    .palette-overlay.open { display: flex; animation: fade-in 200ms var(--ease-out-quart); }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    .palette {
+      width: 88%; max-width: 320px; background: var(--bg-elev-1);
+      border: 1px solid var(--border-strong); border-radius: 16px; overflow: hidden;
+      transform-origin: center top;
+      animation: pop-in 260ms var(--ease-out-quart);
+    }
+    @keyframes pop-in { from { transform: scale(0.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .palette-input {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono); font-size: 13px; color: var(--text-dim);
+    }
+    .palette-section-label {
+      padding: 12px 20px 6px; font-family: var(--font-mono); font-size: 9px; text-transform: uppercase;
+      letter-spacing: 0.2em; color: var(--text-faint);
+    }
+    .palette-item {
+      padding: 10px 20px; font-family: var(--font-mono); font-size: 12px; color: var(--text-dim);
+      display: flex; justify-content: space-between; align-items: center;
+      transition: background 150ms var(--ease-out-quart);
+    }
+    .palette-item:hover, .palette-item:first-of-type { background: var(--accent-soft); color: var(--text); }
+    .palette-item .return { color: var(--accent); font-size: 11px; }
+
+    /* Motion legend */
+    .legend {
+      padding: 48px; border-top: 1px solid var(--border); display: grid; gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+    .legend-item {
+      padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-elev-1);
+    }
+    .legend-item h3 {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em;
+      color: var(--accent); margin-bottom: 10px;
+    }
+    .legend-item p { font-size: 13px; line-height: 1.55; color: var(--text-dim); }
+    .legend-item code { font-family: var(--font-mono); color: var(--text); background: var(--bg-elev-2); padding: 1px 6px; border-radius: 4px; font-size: 11px; }
+
+    /* Motion handoff — M1-M11 × target code stack */
+    .handoff {
+      padding: 16px 48px 64px; display: flex; flex-direction: column; gap: 20px;
+    }
+    .handoff-head {
+      display: flex; flex-direction: column; gap: 6px;
+      padding-bottom: 8px;
+    }
+    .handoff-kicker {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em;
+      color: var(--accent);
+    }
+    .handoff-title {
+      font-family: var(--font-display); font-size: 22px; font-weight: 500; letter-spacing: -0.01em; color: var(--text);
+    }
+    .handoff-sub { font-size: 13px; line-height: 1.55; color: var(--text-dim); max-width: 720px; }
+    .handoff-table-wrap {
+      overflow-x: auto; border: 1px solid var(--border); border-radius: 12px;
+      background: var(--bg-elev-1);
+    }
+    .handoff-table {
+      width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 11px; min-width: 820px;
+    }
+    .handoff-table thead th {
+      text-align: left; padding: 14px 16px; background: var(--bg-elev-2);
+      font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-faint);
+      border-bottom: 1px solid var(--border);
+    }
+    .handoff-table tbody td {
+      padding: 14px 16px; border-bottom: 1px solid var(--border);
+      color: var(--text-dim); vertical-align: top; line-height: 1.5;
+    }
+    .handoff-table tbody tr:last-child td { border-bottom: 0; }
+    .handoff-table tbody tr:hover td { background: var(--accent-soft); color: var(--text); }
+    .handoff-table .hi { color: var(--text); }
+    .handoff-table .sa-yes { color: var(--accent); }
+    .handoff-table .sa-no { color: var(--text-faint); }
+    .handoff-table .sa-partial { color: var(--text-dim); }
+    .handoff-table .stack { color: var(--accent); font-weight: 500; }
+    .handoff-table code { font-family: var(--font-mono); color: var(--text); background: var(--bg-elev-2); padding: 1px 5px; border-radius: 4px; font-size: 10px; }
+    .handoff-legend {
+      display: flex; flex-wrap: wrap; gap: 18px; font-family: var(--font-mono); font-size: 10px; color: var(--text-faint);
+      text-transform: uppercase; letter-spacing: 0.16em;
+    }
+    .handoff-legend .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .handoff-legend .pill::before {
+      content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent);
+    }
+    .handoff-legend .pill.no::before { background: var(--text-faint); }
+    .handoff-legend .pill.partial::before { background: var(--text-dim); }
+
+    /* prefers-reduced-motion — kill everything */
+    @media (prefers-reduced-motion: reduce) {
+      .cursor-orb { display: none; }
+      body { cursor: auto; }
+      .grid-layer { transition: none !important; transform: none !important; }
+      .fab { animation: none; }
+      .palette-overlay.open { animation: none; }
+      .palette { animation: none; }
+      * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor-orb" id="orb" aria-hidden="true"></div>
+  <div class="coord-label" id="coord-label" aria-hidden="true">(0, 0)</div>
+
+  <header class="page-head">
+    <div>
+      <h1>D9 · Cartesian Red Showcase</h1>
+      <div>DS motion reference <span class="tag">· interactive</span> · responsive</div>
+    </div>
+    <div class="head-right">
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="toggle theme">
+        <span class="glyph" aria-hidden="true">◑</span>
+        <span class="theme-label">dark</span>
+      </button>
+      <div>ds:cartesian-red@d9 · showcase · desktop V1 drawer + mobile V3 palette</div>
+    </div>
+  </header>
+
+  <main class="device-grid">
+    <!-- Desktop -->
+    <div class="device">
+      <div class="device-label">Desktop · 1440×900 · <span class="accent-text">Axis V1 Right Drawer</span> dockado no portfolio</div>
+      <div class="viewport-desktop" data-viewport="desktop">
+        <div class="grid-layer" id="grid-desktop">
+          <svg class="motif-svg" viewBox="-720 -450 1440 900" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <!-- origin pulse rings at (0, 0) -->
+            <circle class="origin-ring r1" cx="0" cy="0" fill="none" stroke="var(--accent)" stroke-width="1.2">
+              <animate attributeName="r" values="24;38;24" dur="2.6s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.55;0.08;0.55" dur="2.6s" repeatCount="indefinite" />
+            </circle>
+            <circle class="origin-ring r2" cx="0" cy="0" fill="none" stroke="var(--accent)" stroke-width="1">
+              <animate attributeName="r" values="52;78;52" dur="3.8s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.3;0.04;0.3" dur="3.8s" repeatCount="indefinite" />
+            </circle>
+            <!-- static inner marker at origin -->
+            <circle class="origin-core" cx="0" cy="0" r="3.5" fill="var(--accent)" />
+
+            <!-- orbiting ring around origin -->
+            <g class="orbit-group">
+              <circle cx="0" cy="0" r="104" fill="none" stroke="var(--accent-deep)" stroke-width="1" stroke-dasharray="3 7" opacity="0.7" />
+              <circle class="orbit-dot" cx="104" cy="0" r="4" fill="var(--accent)" />
+              <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="16s" repeatCount="indefinite" />
+            </g>
+
+            <!-- dashed trajectory connecting eggs (order: origin → snake → portfolio → tse → jpglabs → origin) -->
+            <path id="egg-trajectory"
+                  d="M 0 0 L -192 -108 L 168 -132 L 216 156 L -240 132 Z"
+                  fill="none" stroke="var(--accent-deep)" stroke-width="1" stroke-dasharray="3 6" opacity="0.55" />
+
+            <!-- leading solid dot bouncing along the trajectory -->
+            <circle class="leading-dot" r="5" fill="var(--accent)">
+              <animateMotion dur="11s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#egg-trajectory" />
+              </animateMotion>
+            </circle>
+          </svg>
+
+          <!-- ========================================================
+               SHOWCASE MOTIF — eggs plotted at declared cartesian coords
+               tell the portfolio's history (Snake '20 → Portfolio '26 →
+               JPG Labs → TSE). This is NOT a DS primitive. Do NOT ship
+               to Axis/jpglabs.com.br production pages — it's decorative
+               storytelling for the DS showcase only.
+               ======================================================== -->
+          <div class="egg" data-cx="0" data-cy="0"><span class="egg-tip">(0, 0) · origin · cada conversa começa aqui</span></div>
+          <div class="egg" data-cx="-16" data-cy="9"><span class="egg-tip">(−16, 9) · Snake Game · 2020</span></div>
+          <div class="egg" data-cx="14" data-cy="11"><span class="egg-tip">(14, 11) · Portfolio Motion · 2026</span></div>
+          <div class="egg" data-cx="-20" data-cy="-11"><span class="egg-tip">(−20, −11) · JPG Labs OS · 2025→</span></div>
+          <div class="egg" data-cx="18" data-cy="-13"><span class="egg-tip">(18, −13) · TSE eleitoral · 2024→</span></div>
+        </div>
+
+        <nav class="desktop-nav">
+          <div>
+            <span class="nav-brand">JPG<em>LABS</em></span>
+            <span class="nav-tag">· shared auth realm</span>
+          </div>
+          <div class="nav-links">
+            <a href="#" class="active">portfolio</a>
+            <a href="#">chat</a>
+            <a href="#">docs</a>
+            <a href="#">settings</a>
+            <a href="#" class="nav-theme" aria-label="toggle theme">◑</a>
+          </div>
+        </nav>
+
+        <section class="hero-desktop">
+          <div class="hero-kicker">Engenheiro Fullstack Sênior</div>
+          <h2 class="hero-title">Jader<br /><em>Germano</em></h2>
+          <p class="hero-lead">
+            Arquitetura de sistemas escaláveis, governança LGPD e integração de
+            inteligência artificial em fluxos operacionais complexos.
+          </p>
+          <div class="hero-actions">
+            <a href="#" class="btn btn-primary">Contato →</a>
+            <a href="#" class="btn btn-ghost">Ver experiência</a>
+          </div>
+        </section>
+
+        <aside class="drawer-v1" aria-label="Axis realm inspector">
+          <div class="drawer-kicker">V1 · REALM INSPECTOR</div>
+          <div class="drawer-title">Axis</div>
+          <p class="drawer-desc">Auth · MCP peers · session state · variables. Dockado no portfolio autenticado.</p>
+
+          <div class="realm-card"><span class="realm-dot active"></span>auth · logged as jader</div>
+          <div class="realm-card"><span class="realm-dot"></span>MCP · 4 peers connected</div>
+          <div class="realm-card"><span class="realm-dot active"></span>session · portfolio.d9</div>
+          <div class="realm-card"><span class="realm-dot"></span>variables · dark mode</div>
+
+          <div class="drawer-messages">
+            <div class="msg user"><span class="role">USER</span><br />Mostra o summary de conquistas do portfolio este mês.</div>
+            <div class="msg"><span class="role">AXIS</span><br />3 commits em <code>feat/shared-auth-realm-s1a</code>, 12 arquivos migrados para Cartesian tokens, OAuth Google com fix crítico em review.</div>
+          </div>
+
+          <div class="drawer-input">
+            <input type="text" placeholder="Pergunte ao Axis…" />
+            <span class="drawer-send">→</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- Mobile -->
+    <div class="device">
+      <div class="device-label">Mobile · 375×812 · <span class="accent-text">V3 Command Palette ⌘K</span> via FAB</div>
+      <div class="viewport-mobile" data-viewport="mobile">
+        <div class="grid-layer" id="grid-mobile" style="background-size: 32px 32px, 32px 32px, 128px 128px, 128px 128px;"></div>
+
+        <div class="mobile-statusbar">9:41</div>
+        <nav class="mobile-nav">
+          <div class="nav-brand" style="font-size: 15px;">JPG<em>LABS</em></div>
+          <div style="color: var(--text-dim);">⋮</div>
+        </nav>
+
+        <section class="mobile-hero">
+          <div class="hero-kicker">Engenheiro Sênior</div>
+          <h2 class="hero-title">Jader<br /><em>Germano</em></h2>
+          <p class="hero-lead">Arquitetura escalável · LGPD · AI engineering.</p>
+          <div class="hero-actions" style="margin-top: 20px;">
+            <a href="#" class="btn btn-primary" style="padding: 10px 18px; font-size: 9px;">Contato →</a>
+          </div>
+        </section>
+
+        <div class="mobile-cards">
+          <div class="proj-card">
+            <span class="period">2024 — ATUAL</span>
+            <span class="title">Digisystem @ TSE</span>
+            <span class="company">Arquitetura de dados eleitorais</span>
+          </div>
+          <div class="proj-card">
+            <span class="period">2023 — 2024</span>
+            <span class="title">JPG Labs · Independente</span>
+            <span class="company">AI platforms · portfólio · governança</span>
+          </div>
+        </div>
+
+        <button class="fab" id="fab" aria-label="abrir command palette">⌘K</button>
+
+        <div class="palette-overlay" id="palette" aria-hidden="true">
+          <div class="palette" role="dialog" aria-label="Axis command palette">
+            <div class="palette-input">🔍 Search Axis…</div>
+            <div class="palette-section-label">RECENT</div>
+            <div class="palette-item">drawer variants <span class="return">↵</span></div>
+            <div class="palette-item">auth realm <span class="return">↵</span></div>
+            <div class="palette-item">theme tokens <span class="return">↵</span></div>
+            <div class="palette-section-label">ACTIONS</div>
+            <div class="palette-item">new thread <span class="return">↵</span></div>
+            <div class="palette-item">toggle theme <span class="return">↵</span></div>
+            <div class="palette-item">export transcript <span class="return">↵</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <section class="legend">
+    <div class="legend-item">
+      <h3>Cursor Orb</h3>
+      <p>Red-glow orb follows cursor with linear interpolation (<code>lerp 0.12</code>). Pointer-events none para não bloquear hovers. Desligado em <code>prefers-reduced-motion</code>.</p>
+    </div>
+    <div class="legend-item">
+      <h3>Grid Parallax</h3>
+      <p>Grade cartesiana se desloca no sentido <strong>oposto</strong> ao cursor com intensidade <code>0.03</code>. Sensação orgânica de profundidade sem tirar foco do conteúdo. Eixos vermelhos permanecem fixos.</p>
+    </div>
+    <div class="legend-item">
+      <h3>Drawer Transitions</h3>
+      <p>V1 Right Drawer dockado no desktop; abrir/fechar com spring <code>cubic-bezier(0.25, 1, 0.5, 1)</code>. Aparece instantâneo nesse protótipo — em produção o AnimatePresence do Framer Motion anima de <code>translateX(100%)</code>.</p>
+    </div>
+    <div class="legend-item">
+      <h3>Command Palette (V3)</h3>
+      <p>Trigger via FAB no mobile (equivalente de ⌘K no desktop). Entrada: fade-in 200ms + scale 0.94→1 260ms. Primeiro item sempre destacado (prontidão pra tecla Enter).</p>
+    </div>
+    <div class="legend-item">
+      <h3>FAB Pulse</h3>
+      <p>Pulso de glow a cada 2.4s pra sinalizar presença sem ser invasivo. Suspenso em <code>reduced-motion</code>.</p>
+    </div>
+    <div class="legend-item">
+      <h3>Typography Stack</h3>
+      <p><strong>Display:</strong> Fraunces (italic nos lastnames). <strong>Body:</strong> IBM Plex Sans. <strong>Mono:</strong> JetBrains Mono (kickers, badges, mensagens do Axis).</p>
+    </div>
+    <div class="legend-item">
+      <h3>Diagonal Tilt (d8 inheritance, amplificado)</h3>
+      <p>Grid rotaciona em torno de <code>BASE_TILT = 5°</code> com ajuste baseado em cursor: <code>tilt = 5 + px * 2.7 − py * 2.0</code>. Range efetivo ~2.6° a ~7.4° (d8 original era 1.4°–4.6°). Suficiente pra sentir o movimento em descanso sem cair em vertigem.</p>
+    </div>
+    <div class="legend-item">
+      <h3>Coord Plot Label</h3>
+      <p>Ao lado do orb, <code>(x, y)</code> em unidades cartesianas (unit = 12px). Origem no centro do viewport desktop; y invertido pra seguir matemática. Desaparece se o cursor sair do viewport.</p>
+    </div>
+    <div class="legend-item">
+      <h3>Easter Egg Hotspots</h3>
+      <p>5 pontos plotados em coords conhecidas — <code>(0,0)</code> origem, projetos históricos, stack atual. Herdam tilt + parallax do grid (ficam "ancorados ao universo"). Hover revela tooltip com contexto.</p>
+    </div>
+    <div class="legend-item">
+      <h3>Origin Pulse + Orbit (d8 inheritance)</h3>
+      <p>Dois anéis concêntricos em <code>(0,0)</code> pulsam em periodos dessincronizados (2.6s + 3.8s) — respiração orgânica. Um grupo orbita o centro a cada 16s; o dot traça um círculo dashed. Reforça "origem viva" em vez de ponto estático.</p>
+    </div>
+    <div class="legend-item">
+      <h3>Dashed Trajectory + Leading Dot</h3>
+      <p>Linha <code>stroke-dasharray: 3 6</code> conecta os eggs na ordem origem → Snake → Portfolio → TSE → JPG Labs → origem (fechamento). Leading dot percorre a trajetória em 11s com <code>animateMotion rotate="auto"</code>. Visual evoca "cronologia" do portfólio.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       MOTION HANDOFF TABLE — Smart Animate? × Target code stack
+       Cada motion do showcase mapeado pro stack de produção. Serve pro
+       dev que vai consumir o DS nas próximas entregas (Axis drawer,
+       jpglabs.com.br hero, etc.) — traduz diretamente o que dá pra
+       prototipar no Figma vs o que precisa nascer em código.
+       ================================================================ -->
+  <section class="handoff">
+    <div class="handoff-head">
+      <div class="handoff-kicker">Motion handoff · d9 → production</div>
+      <h2 class="handoff-title">Smart Animate × target code stack</h2>
+      <p class="handoff-sub">
+        Mapeamento explícito de cada motion (M1–M11) pro stack de consumo.
+        Onde o Smart Animate não cobre (cursor-driven, rAF, SVG
+        animateMotion, scroll-driven complexo), o Figma entra só como
+        referência estática e o motion nasce direto em código.
+      </p>
+    </div>
+
+    <div class="handoff-legend" aria-hidden="true">
+      <span class="pill">Smart Animate cobre</span>
+      <span class="pill partial">Cobre parcial (frames-chave)</span>
+      <span class="pill no">Não cobre — só código</span>
+    </div>
+
+    <div class="handoff-table-wrap">
+      <table class="handoff-table">
+        <thead>
+          <tr>
+            <th style="width: 60px;">#</th>
+            <th style="width: 200px;">Motion</th>
+            <th style="width: 160px;">Smart Animate?</th>
+            <th style="width: 200px;">Target stack</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="hi">M1</td>
+            <td class="hi">Cursor Orb<br /><span style="color: var(--text-faint);">(lerp follow)</span></td>
+            <td class="sa-no">Não cobre</td>
+            <td class="stack">rAF loop + <code>pointermove</code></td>
+            <td>Interpolação contínua (<code>lerp 0.12</code>) depende de event loop. Figma não tem cursor-follow nativo — documentar só estado inicial/repouso.</td>
+          </tr>
+          <tr>
+            <td class="hi">M2</td>
+            <td class="hi">Grid Parallax</td>
+            <td class="sa-no">Não cobre</td>
+            <td class="stack">rAF + CSS <code>transform</code> ou <strong>GSAP quickTo</strong></td>
+            <td>Deslocamento <code>−0.03</code> oposto ao cursor. Em React: <code>useMotionValue</code> + <code>useSpring</code> (Motion). Em produção, <strong>Lenis + GSAP</strong> para smooth scroll combinado.</td>
+          </tr>
+          <tr>
+            <td class="hi">M3</td>
+            <td class="hi">Diagonal Tilt</td>
+            <td class="sa-no">Não cobre</td>
+            <td class="stack">rAF + CSS <code>rotate()</code></td>
+            <td>Fórmula <code>BASE_TILT + px·TILT_X − py·TILT_Y</code>. DS default (<code>3° / 1.6 / 1.2</code>) para produto; showcase usa <code>5° / 2.7 / 2.0</code>. Respeitar <code>prefers-reduced-motion</code>.</td>
+          </tr>
+          <tr>
+            <td class="hi">M4</td>
+            <td class="hi">Coord Plot Label</td>
+            <td class="sa-no">Não cobre</td>
+            <td class="stack">rAF + <code>Math.round</code> (UNIT=12px)</td>
+            <td>Tooltip <code>(x, y)</code> recalculado por frame. Fade-in via <code>opacity</code> + <code>var(--ease-out-quart)</code> 200ms — essa parte cabe em Smart Animate mas o conteúdo do label é dinâmico.</td>
+          </tr>
+          <tr>
+            <td class="hi">M5</td>
+            <td class="hi">Easter Eggs<br /><span style="color: var(--text-faint);">(pulse + ring)</span></td>
+            <td class="sa-yes">Cobre (loop)</td>
+            <td class="stack">CSS <code>@keyframes</code> infinite</td>
+            <td>Showcase-only. Não shippar em Axis/jpglabs.com.br. Se reaproveitar o pulse ring em outro contexto, OK — é keyframes simples sem JS.</td>
+          </tr>
+          <tr>
+            <td class="hi">M6</td>
+            <td class="hi">Origin Pulse Rings</td>
+            <td class="sa-yes">Cobre (loop)</td>
+            <td class="stack">SVG <code>&lt;animate&gt;</code> ou CSS <code>@keyframes</code></td>
+            <td>Dois anéis dessincronizados (2.6s + 3.8s). SVG animate é mais fiel ao protótipo. Em React, <code>motion.circle</code> com <code>animate={...}</code> + <code>repeat: Infinity</code>.</td>
+          </tr>
+          <tr>
+            <td class="hi">M7</td>
+            <td class="hi">Orbit Ring</td>
+            <td class="sa-partial">Cobre parcial</td>
+            <td class="stack">SVG <code>animateTransform</code> ou <strong>GSAP timeline</strong></td>
+            <td>Rotação contínua em torno do origin. Figma anima via After Delay em loop curto, mas dashed stroke + velocidade constante fica mais limpo em SVG ou <code>gsap.to(..., { rotation: 360, repeat: -1 })</code>.</td>
+          </tr>
+          <tr>
+            <td class="hi">M8</td>
+            <td class="hi">Trajectory + Leading Dot</td>
+            <td class="sa-no">Não cobre</td>
+            <td class="stack">SVG <code>animateMotion</code> + <code>&lt;mpath&gt;</code></td>
+            <td>Dot percorrendo path dashed em 11s com <code>rotate="auto"</code>. Em React/GSAP: <code>gsap.to(dot, { motionPath: { path, autoRotate: true } })</code> (plugin MotionPath).</td>
+          </tr>
+          <tr>
+            <td class="hi">M9</td>
+            <td class="hi">Drawer V1 (open/close)</td>
+            <td class="sa-yes">Cobre</td>
+            <td class="stack"><strong>Framer Motion</strong> <code>AnimatePresence</code></td>
+            <td>Translate <code>translateX(100% → 0)</code> 300ms <code>var(--ease-out-quart)</code>. Smart Animate entre 2 frames (drawer fechado/aberto) replica direto. Cuidar de <strong>focus trap</strong> e <strong>aria-modal</strong> no código.</td>
+          </tr>
+          <tr>
+            <td class="hi">M10</td>
+            <td class="hi">Mobile Palette V3<br /><span style="color: var(--text-faint);">(⌘K)</span></td>
+            <td class="sa-yes">Cobre</td>
+            <td class="stack">CSS <code>@keyframes</code> ou <strong>Framer Motion</strong></td>
+            <td>Overlay fade-in 200ms + palette scale <code>0.94 → 1</code> 260ms. Smart Animate entre 2 frames (fechado/aberto). Trigger via FAB (mobile) e <code>⌘K</code> (desktop). Primeiro item pré-destacado.</td>
+          </tr>
+          <tr>
+            <td class="hi">M11</td>
+            <td class="hi">FAB Pulse</td>
+            <td class="sa-yes">Cobre (loop)</td>
+            <td class="stack">CSS <code>@keyframes</code> 2.4s</td>
+            <td>Box-shadow oscilando a cada 2.4s. Suspenso em <code>prefers-reduced-motion</code>. Baixo custo — pode ficar puro CSS em produto.</td>
+          </tr>
+          <tr>
+            <td class="hi">—</td>
+            <td class="hi">Theme swap (dark ↔ light)</td>
+            <td class="sa-yes">Cobre</td>
+            <td class="stack">CSS custom props + <code>data-theme</code></td>
+            <td>Swap instantâneo dos tokens (sem transição). DS contract: polaridade flipa inteira de uma vez, accent (<code>#c04a3f</code>) permanece estável. Persistir em <code>localStorage</code>; honrar <code>prefers-color-scheme</code> no primeiro load.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <script>
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const orb = document.getElementById('orb');
+    const coordLabel = document.getElementById('coord-label');
+    const viewports = document.querySelectorAll('[data-viewport]');
+    const desktopVP = document.querySelector('[data-viewport="desktop"]');
+    /* ----------------------------------------------------------------
+     * Cartesian Motion constants
+     * ----------------------------------------------------------------
+     * BASE_TILT bumped from d8's 3° → d9's 5° for showcase visibility.
+     * In product usage (Axis drawer, jpglabs.com.br hero) keep d8's 3°
+     * baseline unless the viewport is fully dedicated to the cartesian
+     * motif (like this showcase). Tilt amplitudes were also amplified
+     * (d8: 1.6/1.2 → d9: 2.7/2.0) for the same reason — these are
+     * SHOWCASE-TUNED values, not DS defaults.
+     *
+     * UNIT and ease-out-quart ARE DS primitives and should stay
+     * canonical across consumers.
+     * ---------------------------------------------------------------- */
+    const BASE_TILT = 5;     // deg — showcase-tuned (DS default = 3°)
+    const TILT_X_AMP = 2.7;  // horizontal amplitude — showcase-tuned (DS default = 1.6)
+    const TILT_Y_AMP = 2.0;  // vertical amplitude — showcase-tuned (DS default = 1.2)
+    const UNIT = 12;         // pixels per cartesian unit — DS primitive
+
+    // Plot easter eggs at their declared cartesian coords
+    desktopVP.querySelectorAll('.egg').forEach((el) => {
+      const cx = parseFloat(el.dataset.cx);
+      const cy = parseFloat(el.dataset.cy);
+      // grid-layer is inset -15% so its center ~ center of viewport
+      el.style.left = `calc(50% + ${cx * UNIT}px)`;
+      el.style.top = `calc(50% - ${cy * UNIT}px)`;
+    });
+
+    // Cursor follower with lerp
+    let target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let pos = { ...target };
+
+    window.addEventListener('pointermove', (e) => {
+      target.x = e.clientX; target.y = e.clientY;
+    }, { passive: true });
+
+    function raf() {
+      if (prefersReduced) return;
+      pos.x += (target.x - pos.x) * 0.12;
+      pos.y += (target.y - pos.y) * 0.12;
+      orb.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+
+      // Parallax grid per viewport — relative to viewport center, with diagonal tilt
+      viewports.forEach((vp) => {
+        const rect = vp.getBoundingClientRect();
+        const ccx = rect.left + rect.width / 2;
+        const ccy = rect.top + rect.height / 2;
+        const dx = (pos.x - ccx) * -0.03;
+        const dy = (pos.y - ccy) * -0.03;
+        const px = (pos.x - ccx) / rect.width;
+        const py = (pos.y - ccy) / rect.height;
+        // Tilt OPOSTO à direção do mouse (não segue) — match d8 intent:
+        // mouse pra direita → plano rotaciona anti-horário (tilt diminui)
+        const tilt = BASE_TILT - px * TILT_X_AMP + py * TILT_Y_AMP;
+        const grid = vp.querySelector('.grid-layer');
+        if (grid) grid.style.transform = `translate(${dx}px, ${dy}px) rotate(${tilt}deg)`;
+      });
+
+      // Coord label — cartesian (x, y) relative to desktop viewport center
+      if (coordLabel && desktopVP) {
+        const rect = desktopVP.getBoundingClientRect();
+        const inside =
+          pos.x >= rect.left && pos.x <= rect.right &&
+          pos.y >= rect.top && pos.y <= rect.bottom;
+        if (inside) {
+          const cx = Math.round((pos.x - (rect.left + rect.width / 2)) / UNIT);
+          const cy = Math.round(((rect.top + rect.height / 2) - pos.y) / UNIT);
+          coordLabel.textContent = `(${cx}, ${cy})`;
+          coordLabel.style.transform = `translate(${pos.x + 18}px, ${pos.y - 28}px)`;
+          coordLabel.classList.add('visible');
+        } else {
+          coordLabel.classList.remove('visible');
+        }
+      }
+
+      requestAnimationFrame(raf);
+    }
+    if (!prefersReduced) requestAnimationFrame(raf);
+
+    // Command palette open/close
+    const fab = document.getElementById('fab');
+    const palette = document.getElementById('palette');
+    fab?.addEventListener('click', () => {
+      palette.classList.add('open');
+      palette.setAttribute('aria-hidden', 'false');
+    });
+    palette?.addEventListener('click', (e) => {
+      if (e.target === palette) {
+        palette.classList.remove('open');
+        palette.setAttribute('aria-hidden', 'true');
+      }
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        palette.classList.remove('open');
+        palette.setAttribute('aria-hidden', 'true');
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        palette.classList.toggle('open');
+      }
+    });
+
+    /* ----------------------------------------------------------------
+     * Theme toggle — flips data-theme on <html>.
+     * Persists via localStorage; respects prefers-color-scheme on first
+     * visit. Both the page-head button and the desktop-mock nav anchor
+     * (◑) trigger the same swap. No animations on swap — instant token
+     * change is the DS contract.
+     * ---------------------------------------------------------------- */
+    const root = document.documentElement;
+    const themeLabel = document.querySelector('.theme-label');
+    const saved = (() => {
+      try { return localStorage.getItem('d9-theme'); } catch { return null; }
+    })();
+    const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+    const initialTheme = saved || (systemPrefersLight ? 'light' : 'dark');
+    applyTheme(initialTheme);
+
+    function applyTheme(theme) {
+      root.setAttribute('data-theme', theme);
+      if (themeLabel) themeLabel.textContent = theme;
+      try { localStorage.setItem('d9-theme', theme); } catch { /* ignore */ }
+    }
+
+    function toggleTheme() {
+      const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      applyTheme(current === 'light' ? 'dark' : 'light');
+    }
+
+    document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
+    document.querySelectorAll('.nav-theme').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleTheme();
+      });
+    });
+  </script>
+</body>
+</html>

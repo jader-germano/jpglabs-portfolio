@@ -12,7 +12,8 @@ import LegalPage from './pages/Legal';
 import OfferPage from './pages/Offer';
 import PortfolioPage from './pages/Portfolio';
 import ProductDetailPage from './pages/ProductDetail';
-import PublicHomePage from './pages/PublicHome';
+// PublicHomePage preservado mas não é mais root — portfolio é a carta de entrada
+// import PublicHomePage from './pages/PublicHome';
 import ServicesPage from './pages/Services';
 import DocsPage from './pages/Docs';
 import LoginPage from './pages/Login';
@@ -38,7 +39,8 @@ function AppRoutes() {
       <BrowserRouter basename={basename}>
         <Layout>
           <Routes>
-            <Route path={ROUTES.root} element={<PublicHomePage />} />
+            {/* Portfolio é carta de entrada — root redireciona pra portfolio canônico do Jader */}
+            <Route path={ROUTES.root} element={<Navigate to={ROUTES.portfolioCanonical} replace />} />
             <Route path={ROUTES.login} element={<LoginPage />} />
             <Route path={ROUTES.authCallback} element={<AuthCallbackPage />} />
             <Route path={ROUTES.offer} element={<OfferPage />} />
