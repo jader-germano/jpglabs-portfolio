@@ -1,26 +1,10 @@
-import { useCallback, useRef, useState, type DragEvent, type ChangeEvent } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, FileText, Check, AlertCircle, Loader2 } from "lucide-react";
+import { useDropzone } from "react-dropzone";
 import { type Portfolio } from "../lib/portfolio-schema";
 import { useLanguage } from "../context/LanguageProvider";
 import { portfolioApiBaseUrl } from "../lib/portfolio-api";
-
-// NOTE: The upstream portfolio-backend version depends on `react-dropzone`.
-// During phase-1 consolidation that dependency could not be installed in this
-// sandbox, so we fall back to a native file input + manual drag/drop handlers.
-// The visual and behavioral contract stays equivalent. react-dropzone should
-// be added and this component reconnected to it in a follow-up phase.
-
-const ACCEPTED_MIME_TYPES = ["text/plain", "application/pdf"] as const;
-const ACCEPTED_EXTENSIONS = [".txt", ".pdf"] as const;
-
-const isAcceptedFile = (file: File): boolean => {
-  if (ACCEPTED_MIME_TYPES.includes(file.type as (typeof ACCEPTED_MIME_TYPES)[number])) {
-    return true;
-  }
-  const lowered = file.name.toLowerCase();
-  return ACCEPTED_EXTENSIONS.some((ext) => lowered.endsWith(ext));
-};
 
 export default function ResumeUpload() {
   const { dictionary } = useLanguage();
@@ -28,43 +12,23 @@ export default function ResumeUpload() {
   const [status, setStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
   const [result, setResult] = useState<Portfolio | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isDragActive, setIsDragActive] = useState(false);
-  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const acceptFile = useCallback((candidate: File | null | undefined) => {
-    if (!candidate) return;
-    if (!isAcceptedFile(candidate)) return;
-    setFile(candidate);
-    setStatus("idle");
-    setError(null);
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles.length > 0) {
+      setFile(acceptedFiles[0]);
+      setStatus("idle");
+      setError(null);
+    }
   }, []);
 
-  const handleRootClick = () => {
-    inputRef.current?.click();
-  };
-
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const next = event.target.files?.[0] ?? null;
-    acceptFile(next);
-    event.target.value = "";
-  };
-
-  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragActive(true);
-  };
-
-  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragActive(false);
-  };
-
-  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragActive(false);
-    const dropped = event.dataTransfer.files?.[0] ?? null;
-    acceptFile(dropped);
-  };
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "text/plain": [".txt"],
+      "application/pdf": [".pdf"],
+    },
+    maxFiles: 1,
+  });
 
   const handleParse = async () => {
     if (!file) return;
@@ -134,32 +98,14 @@ export default function ResumeUpload() {
 
         <div className="space-y-4">
           <div
-            role="button"
-            tabIndex={0}
-            onClick={handleRootClick}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                handleRootClick();
-              }
-            }}
-            onDragOver={handleDragOver}
-            onDragEnter={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
+            {...getRootProps()}
             className={`relative group cursor-pointer rounded-[32px] border-2 border-dashed transition-all p-12 text-center ${
               isDragActive
                 ? "border-red-500 bg-red-500/5"
                 : "border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]"
             }`}
           >
-            <input
-              ref={inputRef}
-              type="file"
-              accept={[...ACCEPTED_MIME_TYPES, ...ACCEPTED_EXTENSIONS].join(",")}
-              className="hidden"
-              onChange={handleInputChange}
-            />
+            <input {...getInputProps()} />
 
             <div className="space-y-4">
               <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
