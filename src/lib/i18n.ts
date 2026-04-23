@@ -1,0 +1,641 @@
+export const SUPPORTED_LOCALES = ["en", "pt"] as const;
+
+export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
+
+export const DEFAULT_LOCALE: AppLocale = "en";
+export const LANGUAGE_STORAGE_KEY = "jpglabs-language";
+
+export const resolveLocale = (value: unknown): AppLocale => (value === "pt" ? "pt" : "en");
+
+export const dictionaries = {
+  en: {
+    nav: {
+      items: {
+        home: "Home",
+        login: "Login",
+        assistant: "Assistant",
+        instances: "Instances",
+        guardian: "Guardian",
+      },
+      logout: "Logout",
+      language: "Language",
+      authenticatedUser: "Authenticated User",
+      localeOptions: {
+        en: "English",
+        pt: "Português",
+      },
+    },
+    hero: {
+      eyebrow: "Senior Full-Stack Engineer",
+      status: "Available",
+      summary:
+        "8 years delivering end-to-end systems. Java · Node.js · Angular · React · Microservices · High-availability platforms.",
+      emphasis: "Senior full-stack delivery, architecture, and technical leadership",
+      scroll: "Scroll",
+    },
+    whatIBuild: {
+      pillars: [
+        {
+          title: "Engineering",
+          desc: "Java, Node.js, TypeScript and Angular across backend, frontend and integration layers for long-lived production systems.",
+        },
+        {
+          title: "Architecture",
+          desc: "Microservices, scalable systems, relational databases and technical coordination for enterprise and institutional environments.",
+        },
+        {
+          title: "Delivery & Operations",
+          desc: "Docker, Kubernetes, AWS, Azure DevOps and GitLab CI/CD supporting sustainable delivery with Scrum and Kanban teams.",
+        },
+      ],
+    },
+    codeSnippets: {
+      eyebrow: "Production Patterns · Real Systems",
+      title: "Architecture in Practice",
+      description: "Abstracted implementation patterns from production systems. Project identity stays visible; proprietary source stays protected.",
+      copy: "Copy",
+      copied: "Copied",
+      items: [
+        {
+          title: "Privacy-Safe Session Audit Buffer",
+          subtitle: "Deduplicate audit events across stateless authenticated flows",
+          context: "TSE Electoral Court · Java 21 · Spring Boot 3",
+        },
+        {
+          title: "Legacy Boolean Persistence Mapping",
+          subtitle: "Normalize numeric database flags at the persistence boundary",
+          context: "TSE Electoral Court · MyBatis 3 · Oracle DB",
+        },
+        {
+          title: "Transactional Booking Guard",
+          subtitle: "Protect service-layer rules before persisting reservations",
+          context: "GoBarber · Node.js · Scheduling Domain",
+        },
+        {
+          title: "Repository Boundary Pattern",
+          subtitle: "Keep data access isolated behind intention-driven contracts",
+          context: "GoBarber · Repository Layer · PostgreSQL",
+        },
+        {
+          title: "Client Auth State Lifecycle",
+          subtitle: "Hydrate, persist, and clear session state consistently in the UI",
+          context: "GoBarber Frontend · React · Axios",
+        },
+      ],
+    },
+    projects: {
+      eyebrow: "Selected Work",
+      title: "Projects",
+      viewGithub: "View on GitHub",
+      confidential: "Confidential · NDA",
+      items: [
+        {
+          category: "Full-Stack · Open Source",
+          desc: "Production-grade barber appointment platform with explicit service boundaries, JWT auth, scheduling rules, React frontend, and Expo mobile support.",
+        },
+        {
+          category: "Government · Java · LGPD",
+          desc: "Teacher registry system for Brazil's Electoral Court (TSE). LGPD-compliant, identity-aware, Oracle-backed, and built around strongly documented integration boundaries.",
+        },
+        {
+          category: "AI · Infrastructure",
+          desc: "AI automation platform. n8n workflows, MCP Protocol, Traefik ingress, WhatsApp bot, Kiwify payment hooks. Self-hosted on k3s.",
+        },
+      ],
+    },
+    experience: {
+      eyebrow: "Career",
+      title: "Experience",
+      items: [
+        {
+          company: "Digisystem",
+          period: "2024 – Present",
+          role: "Senior Software Engineer",
+          desc: "Developing and maintaining the GED system for the TSE, leading technical reviews, deploy flow coordination and UX modernization for a corporate HR module.",
+        },
+        {
+          company: "Revizia",
+          period: "2023",
+          role: "Senior Full-Stack Developer",
+          desc: "Worked on a fiscal platform, delivering new features and integrations with Jira and Google Maps.",
+        },
+        {
+          company: "CBDE",
+          period: "2022",
+          role: "IT Coordinator / Senior Full-Stack Developer",
+          desc: "Coordinated and developed the SIGECOM platform, introducing Node.js, Docker and Kubernetes to improve team delivery and deployment operations.",
+        },
+        {
+          company: "Spread",
+          period: "2021 – 2022",
+          role: "Full-Stack Developer",
+          desc: "Maintained the authentication system used by security staff at Caixa branches with Node.js, Express, Ember.js and PostgreSQL.",
+        },
+      ],
+    },
+    skills: {
+      eyebrow: "Tech Stack",
+      title: "Skills",
+      categories: {
+        backend: "Backend",
+        frontend: "Frontend",
+        devops: "DevOps",
+        aiAutomation: "Quality & Delivery",
+      },
+    },
+    resumeUpload: {
+      eyebrow: "Platform Feature",
+      titleLineOne: "Instantiate Your",
+      titleLineTwo: "Own Portfolio",
+      description:
+        "Upload a real resume and the backend will extract structured data, validate it against the source text, and only then expose a generated profile.",
+      success: "Resume Parsed Successfully!",
+      labels: {
+        name: "Name",
+        title: "Title",
+        skills: "Skills",
+      },
+      generateLink: "Generate Portfolio Link",
+      dropzoneIdle: "Drop your resume here",
+      dropzoneFileTypes: "PDF or TXT (Max 5MB)",
+      parsing: "Validating resume with AI...",
+      action: "Instantiate Portfolio",
+      genericError: "Something went wrong",
+      parseError: "Failed to parse resume",
+    },
+    knowledgeVault: {
+      eyebrow: "Bonus Session",
+      title: "Knowledge Vault",
+      description:
+        "My personal digital garden. A centralized hub of technical solutions, architectural decisions, and AI prompts used across my projects.",
+      searchPlaceholder: "Search documentation...",
+      categories: [
+        { name: "Infrastructure", countLabel: "12 Articles" },
+        { name: "AI Agents", countLabel: "8 Articles" },
+        { name: "Full-Stack", countLabel: "15 Articles" },
+      ],
+      explore: "Explore the Vault",
+      latestTitle: "Latest Entry: Portfolio k3s Migration",
+      latestDescription: "Documenting the 404 resolution and ingress configuration.",
+      rawRepository: "View Raw Repository",
+    },
+    cta: {
+      titleLineOne: "Let's Build",
+      titleLineTwo: "Something Real",
+      description: "Available for senior engineering roles, technical consulting, and AI integration projects.",
+      linkedin: "LinkedIn Profile",
+    },
+    footer: "© 2026 Jader Germano · All Systems Operational",
+    login: {
+      title: "Access Hub",
+      subtitle: "Authorized Personnel Only",
+      expired: "Your session expired after 5 minutes of inactivity. Sign in again to continue.",
+      credentialsError: "The provided e-mail credentials were rejected.",
+      accessDenied: "This sign-in attempt was denied by the identity provider.",
+      emailError: "Unable to authenticate with e-mail and password.",
+      github: "Sign in with GitHub",
+      google: "Sign in with Google",
+      emailToggle: "Sign in with E-mail",
+      emailLabel: "E-mail",
+      passwordLabel: "Password",
+      emailSubmit: "Continue with E-mail",
+      emailSubmitting: "Authenticating...",
+      brandTitle: "JPG Labs",
+      brandSubtitle: "Private operational access",
+      legalPrefix: "By signing in, you agree to our",
+      terms: "Terms of Service",
+      privacy: "Privacy Policy",
+    },
+    sessionWarning: {
+      eyebrow: "Session Warning",
+      title: "Automatic logout in {seconds}s",
+      body: "For security, authenticated access expires after 5 minutes of inactivity. Interact now to keep the current session alive.",
+      badge: "Inactivity timeout protection active",
+      stay: "Stay Signed In",
+      logout: "Logout Now",
+    },
+    terms: {
+      back: "Back to login",
+      eyebrow: "Legal",
+      title: "Terms of Service",
+      description:
+        "Operational terms governing access to the JPG Labs authenticated workspace, protected technical material, and owner-only dashboard capabilities made available after sign-in.",
+      sections: [
+        {
+          title: "1. Authenticated Access",
+          body: "Private routes are reserved for authorized users and approved operators. Access must be performed through the configured identity providers and can be revoked immediately when misuse, credential sharing, impersonation, or suspicious activity is detected.",
+        },
+        {
+          title: "2. Session Security",
+          body: "Authenticated sessions are protected by a five-minute inactivity timeout. A ten-second warning is displayed before automatic logout so the user can explicitly continue the session. JPG Labs may terminate sessions early when security posture, device trust, or policy violations require it.",
+        },
+        {
+          title: "3. Intellectual Property and Confidential Material",
+          body: "Protected dashboards, documents, architecture notes, snippets, diagrams, prompts, and operational artifacts remain the intellectual property of JPG Labs and Jader Philipe Germano unless an explicit written agreement states otherwise. Downloading, redistribution, reverse engineering, resale, or reuse without authorization is prohibited.",
+        },
+        {
+          title: "4. Acceptable Operational Conduct",
+          body: "Users must preserve the confidentiality of credentials, keep their workstation protected, and avoid using the private area for automated scraping, abusive requests, credential stuffing, prompt extraction, denial-of-service behavior, or any activity that compromises service stability or owner operations.",
+        },
+        {
+          title: "5. Availability, Changes and Suspension",
+          body: "The platform is provided on a best-effort basis for portfolio, collaboration, and technical evaluation purposes. Features, protected routes, model providers, or documents may be changed, limited, or suspended without prior notice when infrastructure, legal, security, or product conditions require it.",
+        },
+        {
+          title: "6. Governing Rights and Contact",
+          body: "These terms do not transfer any copyright, trademark, or licensing rights except where a written contract expressly grants them. Requests related to access, compliance, or legal communication should be directed to the official JPG Labs contact channels published in this portfolio.",
+        },
+      ],
+    },
+    privacy: {
+      back: "Back to login",
+      eyebrow: "Legal",
+      title: "Privacy Policy",
+      description: "Privacy commitments related to authentication, session handling, audit trails, and access to the JPG Labs protected workspace.",
+      sections: [
+        {
+          title: "1. Data Collected",
+          body: "When authentication is used, the platform may process identity data returned by GitHub, Google, or the e-mail/password flow, including name, e-mail address, provider identifier, session identifiers, and role metadata required for access control.",
+        },
+        {
+          title: "2. Session and Security Logs",
+          body: "The platform stores secure session identifiers, inactivity timeout state, device and route access metadata, and minimal audit information needed to protect private routes and investigate incidents. Sensitive secrets, raw provider tokens, and backend credentials are never exposed in the frontend.",
+        },
+        {
+          title: "3. Purpose and Legal Basis",
+          body: "Personal data is processed only for legitimate operational purposes such as authentication, authorization, service integrity, fraud prevention, protected-content delivery, and owner-side support. Data use is limited to what is necessary to operate the protected workspace and maintain service security.",
+        },
+        {
+          title: "4. Protected Content and Access Minimization",
+          body: "Private documents, snippets, dashboards, architectural references, and operational assets are exposed only to authenticated users with the minimum role required for the action. PRIME_OWNER-only detail views are intentionally restricted and may not be disclosed to other roles.",
+        },
+        {
+          title: "5. Retention, Deletion and User Rights",
+          body: "Identity and audit records are retained only for operational, security, compliance, and fraud-prevention needs. Requests related to access review, correction, or deletion should be handled through the official JPG Labs contact channels, subject to legal and security retention obligations.",
+        },
+        {
+          title: "6. International Providers and Security Controls",
+          body: "Authentication and infrastructure partners may process limited identity data according to their own privacy terms. JPG Labs applies session timeouts, restricted routes, server-side secrets, and owner-governed controls to reduce exposure, but no internet-connected service can guarantee absolute immunity from outages or attacks.",
+        },
+      ],
+    },
+    instances: {
+      title: "Active Instances",
+      subtitle: "Real-time cluster metrics and pod status",
+      guardianCta: "Guardian Console",
+      empty: "No running containers detected. Contact Guardian.",
+      cpu: "CPU Usage",
+      memory: "Memory",
+      live: "Live cluster synchronization active",
+      statuses: {
+        Running: "Running",
+        Pending: "Pending",
+        Error: "Error",
+        Terminating: "Terminating",
+      },
+    },
+    guardian: {
+      title: "Guardian Console",
+      subtitle: "System integrity and self-healing monitor",
+      healthy: "System Healthy",
+      admin: "Master Admin",
+      replicaTitle: "Replica Status (Blue/Green)",
+      replicaAStatus: "Active Core",
+      replicaBStatus: "Standby / Updating",
+      uptime: "Uptime",
+      load: "Load",
+      version: "Version",
+      status: "Status",
+      syncing: "Syncing Context...",
+      logs: "System Logs",
+      logLines: [
+        "Replica-A: Infrastructure check completed. All systems GO.",
+        "Cron: Starting daily backup routine...",
+        "Traefik: Detected latency spike on n8n. Scaling...",
+        "Replica-A: Auto-healing triggered. Latency resolved.",
+      ],
+      neuralLoad: "Neural Load",
+      contextWindow: "Context Window",
+      tokensActive: "Tokens active in memory",
+      nextUpdate: "Next Auto-Update",
+      sunday: "Sunday",
+    },
+  },
+  pt: {
+    nav: {
+      items: {
+        home: "Início",
+        login: "Login",
+        assistant: "Assistente",
+        instances: "Instâncias",
+        guardian: "Guardian",
+      },
+      logout: "Sair",
+      language: "Idioma",
+      authenticatedUser: "Usuário autenticado",
+      localeOptions: {
+        en: "English",
+        pt: "Português",
+      },
+    },
+    hero: {
+      eyebrow: "Engenheiro Full-Stack Sênior",
+      status: "Disponível",
+      summary:
+        "8 anos entregando sistemas de ponta a ponta. Java · Node.js · Angular · React · Microsserviços · Plataformas de alta disponibilidade.",
+      emphasis: "Entrega full-stack sênior, arquitetura e liderança técnica",
+      scroll: "Role",
+    },
+    whatIBuild: {
+      pillars: [
+        {
+          title: "Engenharia",
+          desc: "Java, Node.js, TypeScript e Angular em backend, frontend e integrações para sistemas de produção de longa duração.",
+        },
+        {
+          title: "Arquitetura",
+          desc: "Microsserviços, sistemas escaláveis, bancos relacionais e coordenação técnica para ambientes corporativos e institucionais.",
+        },
+        {
+          title: "Cloud & Infra",
+          desc: "Docker, Kubernetes, AWS, Azure DevOps e GitLab CI/CD sustentando entregas contínuas em times Scrum e Kanban.",
+        },
+      ],
+    },
+    codeSnippets: {
+      eyebrow: "Padrões de Produção · Sistemas Reais",
+      title: "Arquitetura em Prática",
+      description: "Padrões de implementação abstraídos de sistemas reais. A identidade dos projetos permanece; o código proprietário não.",
+      copy: "Copiar",
+      copied: "Copiado",
+      items: [
+        {
+          title: "Buffer de Auditoria com Privacidade",
+          subtitle: "Deduplicação de eventos em fluxos autenticados stateless",
+          context: "TSE · Java 21 · Spring Boot 3",
+        },
+        {
+          title: "Mapeamento de Boolean Legado",
+          subtitle: "Normalização de flags numéricas na fronteira de persistência",
+          context: "TSE · MyBatis 3 · Oracle DB",
+        },
+        {
+          title: "Guarda Transacional de Agendamento",
+          subtitle: "Proteção das regras de negócio antes da persistência",
+          context: "GoBarber · Node.js · Domínio de Agendamento",
+        },
+        {
+          title: "Padrão de Fronteira de Repositório",
+          subtitle: "Isolamento do acesso a dados por contratos orientados à intenção",
+          context: "GoBarber · Camada de Repositório · PostgreSQL",
+        },
+        {
+          title: "Ciclo de Estado de Autenticação no Cliente",
+          subtitle: "Hidratação, persistência e limpeza consistente da sessão na UI",
+          context: "GoBarber Frontend · React · Axios",
+        },
+      ],
+    },
+    projects: {
+      eyebrow: "Trabalhos Selecionados",
+      title: "Projetos",
+      viewGithub: "Ver no GitHub",
+      confidential: "Confidencial · NDA",
+      items: [
+        {
+          category: "Full-Stack · Open Source",
+          desc: "Plataforma de agendamentos para barbearia em nível de produção, com regras de serviço explícitas, autenticação JWT, frontend React e app mobile em Expo.",
+        },
+        {
+          category: "Governo · Java · LGPD",
+          desc: "Sistema de cadastro de docentes para a Justiça Eleitoral, aderente à LGPD, orientado a identidade e sustentado por integrações fortemente documentadas.",
+        },
+        {
+          category: "IA · Infraestrutura",
+          desc: "Plataforma de automação com IA. Workflows n8n, protocolo MCP, Traefik, bot de WhatsApp e integrações de pagamento. Auto-hospedada em k3s.",
+        },
+      ],
+    },
+    experience: {
+      eyebrow: "Carreira",
+      title: "Experiência",
+      items: [
+        {
+          company: "Digisystem",
+          period: "2024 – Atual",
+          role: "Engenheiro de Software Sênior",
+          desc: "Desenvolvimento e sustentação do sistema GED do TSE, com revisão técnica, coordenação de deploy e modernização de UX para um módulo corporativo de RH.",
+        },
+        {
+          company: "Revizia",
+          period: "2023",
+          role: "Desenvolvedor Full-Stack Sênior",
+          desc: "Atuação em sistema fiscal com entrega de novas funcionalidades e integrações com Jira e Google Maps.",
+        },
+        {
+          company: "CBDE",
+          period: "2022",
+          role: "Coordenador de TI / Desenvolvedor Full-Stack Sênior",
+          desc: "Coordenação e desenvolvimento do SIGECOM, introduzindo Node.js, Docker e Kubernetes para melhorar a entrega e a operação do time.",
+        },
+        {
+          company: "Spread",
+          period: "2021 – 2022",
+          role: "Desenvolvedor Full-Stack",
+          desc: "Sustentação do sistema de autenticação de vigilantes das agências da Caixa com Node.js, Express, Ember.js e PostgreSQL.",
+        },
+      ],
+    },
+    skills: {
+      eyebrow: "Stack Técnica",
+      title: "Competências",
+      categories: {
+        backend: "Backend",
+        frontend: "Frontend",
+        devops: "DevOps",
+        aiAutomation: "Qualidade & Entrega",
+      },
+    },
+    resumeUpload: {
+      eyebrow: "Funcionalidade da Plataforma",
+      titleLineOne: "Instancie Seu",
+      titleLineTwo: "Próprio Portfólio",
+      description:
+        "Envie um currículo real e o backend extrai os dados, valida o resultado contra o texto-fonte e só então expõe o perfil gerado.",
+      success: "Currículo processado com sucesso!",
+      labels: {
+        name: "Nome",
+        title: "Título",
+        skills: "Competências",
+      },
+      generateLink: "Gerar link do portfólio",
+      dropzoneIdle: "Solte seu currículo aqui",
+      dropzoneFileTypes: "PDF ou TXT (máx. 5 MB)",
+      parsing: "Validando currículo com IA...",
+      action: "Instanciar Portfólio",
+      genericError: "Algo deu errado",
+      parseError: "Falha ao processar o currículo",
+    },
+    knowledgeVault: {
+      eyebrow: "Sessão Bônus",
+      title: "Base de Conhecimento",
+      description:
+        "Meu jardim digital pessoal. Um hub centralizado com soluções técnicas, decisões arquiteturais e prompts de IA usados ao longo dos meus projetos.",
+      searchPlaceholder: "Buscar documentação...",
+      categories: [
+        { name: "Infraestrutura", countLabel: "12 Artigos" },
+        { name: "Agentes de IA", countLabel: "8 Artigos" },
+        { name: "Full-Stack", countLabel: "15 Artigos" },
+      ],
+      explore: "Explorar Base",
+      latestTitle: "Última entrada: Migração do portfólio para k3s",
+      latestDescription: "Documentação da correção do 404 e da configuração de ingress.",
+      rawRepository: "Ver repositório bruto",
+    },
+    cta: {
+      titleLineOne: "Vamos Construir",
+      titleLineTwo: "Algo Real",
+      description: "Disponível para posições sênior de engenharia, consultoria técnica e projetos de integração com IA.",
+      linkedin: "Perfil no LinkedIn",
+    },
+    footer: "© 2026 Jader Germano · Todos os sistemas operando",
+    login: {
+      title: "Central de Acesso",
+      subtitle: "Apenas pessoal autorizado",
+      expired: "Sua sessão expirou após 5 minutos de inatividade. Faça login novamente para continuar.",
+      credentialsError: "As credenciais de e-mail informadas foram rejeitadas.",
+      accessDenied: "Esta tentativa de login foi negada pelo provedor de identidade.",
+      emailError: "Não foi possível autenticar com e-mail e senha.",
+      github: "Entrar com GitHub",
+      google: "Entrar com Google",
+      emailToggle: "Entrar com E-mail",
+      emailLabel: "E-mail",
+      passwordLabel: "Senha",
+      emailSubmit: "Continuar com E-mail",
+      emailSubmitting: "Autenticando...",
+      brandTitle: "JPG Labs",
+      brandSubtitle: "Acesso operacional privado",
+      legalPrefix: "Ao entrar, você concorda com nossos",
+      terms: "Termos de Serviço",
+      privacy: "Política de Privacidade",
+    },
+    sessionWarning: {
+      eyebrow: "Aviso de Sessão",
+      title: "Logout automático em {seconds}s",
+      body: "Por segurança, o acesso autenticado expira após 5 minutos de inatividade. Interaja agora para manter a sessão ativa.",
+      badge: "Proteção por timeout de inatividade ativa",
+      stay: "Continuar conectado",
+      logout: "Sair agora",
+    },
+    terms: {
+      back: "Voltar para o login",
+      eyebrow: "Legal",
+      title: "Termos de Serviço",
+      description:
+        "Termos operacionais que regem o acesso ao workspace autenticado da JPG Labs, ao material técnico protegido e às capacidades restritas do dashboard disponibilizadas após o login.",
+      sections: [
+        {
+          title: "1. Acesso Autenticado",
+          body: "As rotas privadas são reservadas a usuários autorizados e operadores aprovados. O acesso deve ocorrer pelos provedores configurados e pode ser revogado imediatamente em caso de uso indevido, compartilhamento de credenciais, tentativa de personificação ou atividade suspeita.",
+        },
+        {
+          title: "2. Segurança de Sessão",
+          body: "As sessões autenticadas são protegidas por expiração após cinco minutos de inatividade. Um aviso de dez segundos é exibido antes do logout automático para que o usuário possa continuar a sessão explicitamente. A JPG Labs pode encerrar a sessão antes desse prazo quando houver exigência de segurança, confiança do dispositivo ou violação de política.",
+        },
+        {
+          title: "3. Propriedade Intelectual e Material Confidencial",
+          body: "Dashboards, documentos, notas arquiteturais, snippets, diagramas, prompts e artefatos operacionais protegidos permanecem como propriedade intelectual da JPG Labs e de Jader Philipe Germano, salvo disposição contratual escrita em sentido diverso. Download, redistribuição, engenharia reversa, revenda ou reutilização sem autorização são proibidos.",
+        },
+        {
+          title: "4. Conduta Operacional Aceitável",
+          body: "Os usuários devem preservar a confidencialidade das credenciais, manter a estação de trabalho protegida e evitar scraping automatizado, requisições abusivas, credential stuffing, extração de prompts, comportamento de negação de serviço ou qualquer atividade que comprometa a estabilidade do serviço ou a operação do proprietário.",
+        },
+        {
+          title: "5. Disponibilidade, Mudanças e Suspensão",
+          body: "A plataforma é fornecida em base de melhor esforço para fins de portfólio, colaboração e avaliação técnica. Funcionalidades, rotas protegidas, provedores de modelo ou documentos podem ser alterados, limitados ou suspensos sem aviso prévio quando houver necessidade de infraestrutura, segurança, requisito legal ou decisão de produto.",
+        },
+        {
+          title: "6. Direitos e Contato",
+          body: "Estes termos não transferem direitos autorais, marcas ou licenças, exceto quando um contrato escrito o fizer expressamente. Solicitações de acesso, conformidade ou comunicação jurídica devem seguir os canais oficiais da JPG Labs publicados neste portfólio.",
+        },
+      ],
+    },
+    privacy: {
+      back: "Voltar para o login",
+      eyebrow: "Legal",
+      title: "Política de Privacidade",
+      description: "Compromissos de privacidade relacionados à autenticação, ao controle de sessão, às trilhas de auditoria e ao acesso ao workspace protegido da JPG Labs.",
+      sections: [
+        {
+          title: "1. Dados Coletados",
+          body: "Quando a autenticação é usada, a plataforma pode processar dados de identidade retornados pelo GitHub, Google ou pelo fluxo de e-mail e senha, incluindo nome, endereço de e-mail, identificador do provedor, identificadores de sessão e metadados de papel necessários ao controle de acesso.",
+        },
+        {
+          title: "2. Sessão e Logs de Segurança",
+          body: "A plataforma armazena identificadores seguros de sessão, estado do timeout de inatividade, metadados de dispositivo e rota, além das informações mínimas de auditoria necessárias para proteger rotas privadas e investigar incidentes. Segredos sensíveis, tokens brutos dos provedores e credenciais de backend nunca são expostos no frontend.",
+        },
+        {
+          title: "3. Finalidade e Base Legítima",
+          body: "Os dados pessoais são tratados apenas para finalidades operacionais legítimas, como autenticação, autorização, integridade do serviço, prevenção a fraude, entrega de conteúdo protegido e suporte do proprietário. O uso é limitado ao necessário para operar a área privada com segurança.",
+        },
+        {
+          title: "4. Conteúdo Protegido e Minimização de Acesso",
+          body: "Documentos privados, snippets, dashboards, referências arquiteturais e ativos operacionais ficam visíveis apenas para usuários autenticados com o papel mínimo exigido para a ação. Visões detalhadas exclusivas de PRIME_OWNER permanecem intencionalmente restritas e não devem ser divulgadas a outros papéis.",
+        },
+        {
+          title: "5. Retenção, Exclusão e Direitos do Usuário",
+          body: "Registros de identidade e auditoria são mantidos apenas para necessidades operacionais, de segurança, conformidade e prevenção a fraude. Solicitações de revisão, correção ou exclusão devem seguir os canais oficiais de contato da JPG Labs, observadas as obrigações legais e de retenção de segurança.",
+        },
+        {
+          title: "6. Provedores Internacionais e Controles de Segurança",
+          body: "Parceiros de autenticação e infraestrutura podem processar dados limitados de identidade conforme seus próprios termos de privacidade. A JPG Labs aplica timeout de sessão, rotas restritas, segredos mantidos no servidor e controles governados pelo proprietário para reduzir exposição, mas nenhum serviço conectado à internet pode garantir imunidade absoluta contra falhas ou ataques.",
+        },
+      ],
+    },
+    instances: {
+      title: "Instâncias Ativas",
+      subtitle: "Métricas do cluster e status dos pods em tempo quase real",
+      guardianCta: "Console Guardian",
+      empty: "Nenhum container em execução foi detectado. Contate o Guardian.",
+      cpu: "Uso de CPU",
+      memory: "Memória",
+      live: "Sincronização do cluster ativa",
+      statuses: {
+        Running: "Executando",
+        Pending: "Pendente",
+        Error: "Erro",
+        Terminating: "Encerrando",
+      },
+    },
+    guardian: {
+      title: "Console Guardian",
+      subtitle: "Monitor de integridade do sistema e autocorreção",
+      healthy: "Sistema saudável",
+      admin: "Administrador master",
+      replicaTitle: "Status das réplicas (Blue/Green)",
+      replicaAStatus: "Núcleo ativo",
+      replicaBStatus: "Standby / Atualizando",
+      uptime: "Uptime",
+      load: "Carga",
+      version: "Versão",
+      status: "Status",
+      syncing: "Sincronizando contexto...",
+      logs: "Logs do sistema",
+      logLines: [
+        "Réplica-A: verificação de infraestrutura concluída. Todos os sistemas OK.",
+        "Cron: iniciando rotina diária de backup...",
+        "Traefik: pico de latência detectado no n8n. Escalando...",
+        "Réplica-A: autocorreção acionada. Latência normalizada.",
+      ],
+      neuralLoad: "Carga neural",
+      contextWindow: "Janela de contexto",
+      tokensActive: "Tokens ativos em memória",
+      nextUpdate: "Próxima atualização automática",
+      sunday: "Domingo",
+    },
+  },
+} as const;
+
+export type AppDictionary = (typeof dictionaries)[AppLocale];
+
+export const getDictionary = (locale: AppLocale): AppDictionary => dictionaries[locale];
