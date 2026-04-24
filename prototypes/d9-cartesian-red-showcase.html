@@ -328,9 +328,13 @@
       transition: border-color 300ms var(--ease-out-quart), background 300ms var(--ease-out-quart);
     }
     .realm-card:hover { border-color: var(--accent-deep); background: var(--bg-elev-3); }
+    /* Realm dot — idle state uses neutral text-faint (in-palette); active
+     * flips to --accent. Prev versao referenciava --good (indefinido),
+     * que em browsers estritos caia pra valor default transparente e em
+     * outros pra verde herdado — fora da paleta Cartesian Red. */
     .realm-dot {
-      width: 6px; height: 6px; border-radius: 50%; background: var(--good);
-      box-shadow: 0 0 8px var(--good);
+      width: 6px; height: 6px; border-radius: 50%; background: var(--text-faint);
+      box-shadow: 0 0 8px var(--text-faint);
     }
     .realm-dot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
     .drawer-messages {
