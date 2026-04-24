@@ -1,9 +1,12 @@
 # Stage 1: Build the Vite application
 FROM node:20-alpine AS build
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+# Copy full workspace tree first so npm workspaces pode resolver o
+# protocolo workspace:* usado em packages/cartesian-red. Se copiarmos
+# so o package*.json e rodarmos npm install antes, npm falha com
+# EUNSUPPORTEDPROTOCOL.
 COPY . .
+RUN npm install
 
 ARG VITE_BASE_PATH=/
 ARG VITE_AUTH_BYPASS=false
