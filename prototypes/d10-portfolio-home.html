@@ -11,8 +11,23 @@
     rel="stylesheet"
   />
   <style>
-    /* ── Cartesian Red tokens (fonte: @jpglabs/cartesian-red/tokens.css) ── */
+    /* ── Cartesian Red tokens (fonte: @jpglabs/cartesian-red/tokens.css) ──
+     * Dark = default; [data-theme="light"] aplica polaridade invertida
+     * sem mexer no accent (#c04a3f mantem contraste AA nos dois modos).
+     * Mesma estrutura do d8 canonical + d9 showcase.
+     */
     :root {
+      /* Theme-independent — mesmo token em dark e light */
+      --accent: #c04a3f;
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+      --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+      --max-content: 72rem; /* 6xl Tailwind */
+    }
+
+    :root,
+    :root[data-theme="dark"] {
       --bg: #0d0d0d;
       --bg-elev-1: #141414;
       --bg-elev-2: #1a1a1a;
@@ -22,7 +37,6 @@
       --text-dim: #999;
       --text-faint: #555;
       --text-ghost: #333;
-      --accent: #c04a3f;
       --accent-soft: rgba(192, 74, 63, 0.08);
       --accent-deep: rgba(192, 74, 63, 0.25);
       --accent-glow: rgba(192, 74, 63, 0.2);
@@ -31,11 +45,30 @@
       --grid-line: rgba(192, 74, 63, 0.08);
       --grid-major: rgba(192, 74, 63, 0.18);
       --axis: rgba(192, 74, 63, 0.4);
-      --font-display: 'Fraunces', Georgia, serif;
-      --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
-      --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-      --max-content: 72rem; /* 6xl Tailwind */
+      --topnav-bg: rgba(13, 13, 13, 0.8);
+      --coord-bg: rgba(13, 13, 13, 0.72);
+    }
+
+    :root[data-theme="light"] {
+      --bg: #fafafa;
+      --bg-elev-1: #f1f1f1;
+      --bg-elev-2: #e8e8e8;
+      --bg-elev-3: #dedede;
+      --surface: #ffffff;
+      --text: #0d0d0d;
+      --text-dim: #555;
+      --text-faint: #9a9a9a;
+      --text-ghost: #c7c7c7;
+      --accent-soft: rgba(192, 74, 63, 0.1);
+      --accent-deep: rgba(192, 74, 63, 0.38);
+      --accent-glow: rgba(192, 74, 63, 0.22);
+      --border: rgba(0, 0, 0, 0.08);
+      --border-strong: rgba(0, 0, 0, 0.14);
+      --grid-line: rgba(192, 74, 63, 0.12);
+      --grid-major: rgba(192, 74, 63, 0.26);
+      --axis: rgba(192, 74, 63, 0.55);
+      --topnav-bg: rgba(250, 250, 250, 0.8);
+      --coord-bg: rgba(250, 250, 250, 0.82);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -96,7 +129,7 @@
       position: fixed; top: 0; left: 0; z-index: 9998;
       font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
       color: var(--accent); padding: 4px 9px; border-radius: 5px;
-      background: rgba(13, 13, 13, 0.72); border: 1px solid var(--accent-deep);
+      background: var(--coord-bg); border: 1px solid var(--accent-deep);
       backdrop-filter: blur(6px); pointer-events: none;
       will-change: transform; opacity: 0;
       transition: opacity 200ms var(--ease-out-quart);
@@ -118,7 +151,7 @@
     /* ── Top Nav (Layout.tsx mirror) ── */
     .topnav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-      border-bottom: 1px solid var(--border); background: rgba(13, 13, 13, 0.8);
+      border-bottom: 1px solid var(--border); background: var(--topnav-bg);
       backdrop-filter: blur(18px);
       height: 64px;
     }
@@ -416,6 +449,44 @@
       letter-spacing: 0.5em; color: #3a3a3a;
     }
 
+    /* ── Theme toggle (floating pill, canto inferior direito) ──
+     * Espelha o padrao de d8/d9: persiste em localStorage, aplica via
+     * data-theme no <html>, honra prefers-color-scheme no primeiro load.
+     */
+    .theme-toggle {
+      position: fixed; bottom: 20px; right: 20px; z-index: 9997;
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--text-dim); background: var(--bg-elev-1);
+      border: 1px solid var(--border-strong); border-radius: 999px;
+      padding: 8px 14px; cursor: none;
+      backdrop-filter: blur(14px);
+      transition: border-color 200ms var(--ease-out-quart),
+                  color 200ms var(--ease-out-quart),
+                  background 200ms var(--ease-out-quart);
+    }
+    .theme-toggle:hover { border-color: var(--accent-deep); color: var(--accent); }
+    .theme-toggle .glyph { font-size: 13px; line-height: 1; }
+
+    /* Light-mode surface overrides — cards que tinham rgba hardcoded
+     * em dark (#171717@0.5 etc) caem pra superficies do token set quando
+     * data-theme=light. Nao ha novos tokens, so aliasing. */
+    [data-theme="light"] .skills-card { background: rgba(255, 255, 255, 0.65); }
+    [data-theme="light"] .exp-card { background: rgba(255, 255, 255, 0.75); }
+    [data-theme="light"] .exp-icon { background: var(--surface); }
+    [data-theme="light"] .nav-pills,
+    [data-theme="light"] .side-socials { background: rgba(0, 0, 0, 0.04); }
+    [data-theme="light"] .nav-pill.active { background: rgba(0, 0, 0, 0.08); }
+    [data-theme="light"] .flagship-overlay { background: rgba(250, 250, 250, 0.45); }
+    [data-theme="light"] .flagship-kicker,
+    [data-theme="light"] .flagship-desc { color: rgba(13, 13, 13, 0.75); }
+    [data-theme="light"] .skill-pill,
+    [data-theme="light"] .exp-period-pill,
+    [data-theme="light"] .exp-stack-pill { background: rgba(0, 0, 0, 0.04); }
+    [data-theme="light"] footer { background: rgba(255, 255, 255, 0.4); }
+    [data-theme="light"] .btn-primary { color: #fafafa; }
+
     /* ── prefers-reduced-motion ── */
     @media (prefers-reduced-motion: reduce) {
       body { cursor: auto; }
@@ -433,6 +504,11 @@
   <div class="coord-label" id="coord-label" aria-hidden="true">(0, 0)</div>
   <div class="ambient-glow"></div>
   <div class="cb-grid-layer" id="grid-layer" aria-hidden="true"></div>
+
+  <button type="button" class="theme-toggle" id="theme-toggle" aria-label="toggle theme">
+    <span class="glyph" aria-hidden="true">◑</span>
+    <span class="theme-label">dark</span>
+  </button>
 
   <!-- Top Nav (Layout.tsx mirror) -->
   <nav class="topnav" aria-label="Main navigation">
@@ -491,6 +567,30 @@
                                   from="0 0 0" to="360 0 0" dur="22s" repeatCount="indefinite" />
               </g>
             </g>
+
+            <!-- Bouncing trajectory + leading dot (d8 canonical inheritance)
+                 Uma curva tracejada conecta origem → orbit center; o ponto
+                 vai-e-volta em pendulum via keyPoints 0;1;0, e um anel
+                 hollow acompanha fazendo "bounce" (r oscila). -->
+            <path id="d10-traj" d="M -400 120 Q 0 -60, 400 60"
+                  fill="none" stroke="var(--accent-deep)" stroke-width="1"
+                  stroke-dasharray="3 6" opacity="0.45" />
+            <circle r="12" fill="none" stroke="var(--accent)"
+                    stroke-width="1.3" opacity="0.6">
+              <animateMotion dur="8s" repeatCount="indefinite"
+                             path="M -400 120 Q 0 -60, 400 60"
+                             keyPoints="0;1;0" keyTimes="0;0.5;1"
+                             calcMode="spline"
+                             keySplines="0.4 0 0.2 1; 0.4 0 0.2 1" />
+              <animate attributeName="r" values="9;16;9" dur="2.4s" repeatCount="indefinite" />
+            </circle>
+            <circle class="orbit-dot" r="3.5" fill="var(--accent)" opacity="0.95">
+              <animateMotion dur="8s" repeatCount="indefinite"
+                             path="M -400 120 Q 0 -60, 400 60"
+                             keyPoints="0;1;0" keyTimes="0;0.5;1"
+                             calcMode="spline"
+                             keySplines="0.4 0 0.2 1; 0.4 0 0.2 1" />
+            </circle>
           </svg>
         </div>
 
@@ -805,6 +905,34 @@
     document.querySelectorAll('.exp-card').forEach((card) => {
       card.addEventListener('click', () => card.classList.toggle('expanded'));
     });
+
+    /* ----------------------------------------------------------------
+     * Theme toggle — flips data-theme on <html>.
+     * Persists via localStorage ('d10-theme'); respects
+     * prefers-color-scheme on first visit. DS contract: token swap
+     * instantaneo, accent (#c04a3f) estavel entre modos.
+     * ---------------------------------------------------------------- */
+    const root = document.documentElement;
+    const themeLabel = document.querySelector('.theme-label');
+    const saved = (() => {
+      try { return localStorage.getItem('d10-theme'); } catch { return null; }
+    })();
+    const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+    const initialTheme = saved || (systemPrefersLight ? 'light' : 'dark');
+    applyTheme(initialTheme);
+
+    function applyTheme(theme) {
+      root.setAttribute('data-theme', theme);
+      if (themeLabel) themeLabel.textContent = theme;
+      try { localStorage.setItem('d10-theme', theme); } catch { /* ignore */ }
+    }
+
+    function toggleTheme() {
+      const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      applyTheme(current === 'light' ? 'dark' : 'light');
+    }
+
+    document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
   </script>
 </body>
 </html>
