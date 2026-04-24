@@ -25,6 +25,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { label: 'Services', path: ROUTES.services, icon: Briefcase },
     { label: 'Products', path: ROUTES.downloads, icon: Download },
     { label: 'Portfolio', path: ROUTES.portfolioCanonical, icon: LayoutGrid },
+    { label: 'All Pages', path: '/all-pages', icon: LayoutGrid },
   ];
 
   const isItemActive = (path: string): boolean => {

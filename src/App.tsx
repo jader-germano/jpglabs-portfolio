@@ -26,6 +26,7 @@ import ServicesPage from './pages/Services';
 import DocsPage from './pages/Docs';
 import LoginPage from './pages/Login';
 import AuthCallbackPage from './pages/AuthCallback';
+import AllPagesPage from './pages/AllPages';
 
 const normalizeBasePath = (value: string): string => value.replace(/\/+$/, '');
 const AI_FRONTEND_BASE = normalizeBasePath(import.meta.env.VITE_AI_FRONTEND_URL ?? '/pi');
@@ -67,6 +68,7 @@ function AppRoutes() {
               <Route path="/privacy" element={<PrivacyPageClient />} />
               <Route path="/terms" element={<TermsPageClient />} />
               <Route path={ROUTES.home} element={<PortfolioHomePage />} />
+              <Route path="/all-pages" element={<AllPagesPage />} />
 
               <Route path={ROUTES.portfolioLegacy} element={<Navigate to={ROUTES.portfolioCanonical} replace />} />
               <Route path={ROUTES.hubLegacy} element={<ExternalRedirect to={toAiFrontend()} />} />
