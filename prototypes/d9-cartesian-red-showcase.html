@@ -894,46 +894,89 @@
       el.style.top = `calc(50% - ${cy * UNIT}px)`;
     });
 
-    // Cursor follower with lerp
+    /* ----------------------------------------------------------------
+     * Cursor follower + grid parallax with lerp.
+     *
+     * Perf contract (matches d8 canonical):
+     *  - pointermove is { passive: true }.
+     *  - rAF is gated: only scheduled while we have pointer input or the
+     *    orb hasn't settled on the target (|delta| > 0.5px). Idle tabs
+     *    cost zero CPU instead of ticking 60fps forever.
+     *  - getBoundingClientRect is cached per-viewport and refreshed on
+     *    resize/scroll — NEVER called inside rAF (layout thrashing).
+     *  - transforms are 2D only (translate + rotate); no width/height
+     *    reads inside the tick body.
+     *  - honors prefers-reduced-motion (disables the loop entirely).
+     * ---------------------------------------------------------------- */
+    const LERP = 0.12;
+    const SETTLE_EPSILON = 0.5;
     let target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     let pos = { ...target };
+    let rafId = 0;
+
+    // Cache viewport rects — refreshed on resize/scroll only.
+    const vpCache = Array.from(viewports).map((vp) => ({
+      vp,
+      grid: vp.querySelector('.grid-layer'),
+      rect: vp.getBoundingClientRect(),
+    }));
+    let desktopRect = desktopVP ? desktopVP.getBoundingClientRect() : null;
+
+    function refreshRects() {
+      vpCache.forEach((entry) => { entry.rect = entry.vp.getBoundingClientRect(); });
+      if (desktopVP) desktopRect = desktopVP.getBoundingClientRect();
+    }
+
+    function schedule() {
+      if (rafId || prefersReduced) return;
+      rafId = requestAnimationFrame(raf);
+    }
 
     window.addEventListener('pointermove', (e) => {
       target.x = e.clientX; target.y = e.clientY;
+      schedule();
     }, { passive: true });
+    window.addEventListener('resize', () => { refreshRects(); schedule(); }, { passive: true });
+    window.addEventListener('scroll', () => { refreshRects(); schedule(); }, { passive: true });
 
     function raf() {
-      if (prefersReduced) return;
-      pos.x += (target.x - pos.x) * 0.12;
-      pos.y += (target.y - pos.y) * 0.12;
+      rafId = 0;
+      const dx = target.x - pos.x;
+      const dy = target.y - pos.y;
+      const moved = Math.abs(dx) > SETTLE_EPSILON || Math.abs(dy) > SETTLE_EPSILON;
+      if (moved) {
+        pos.x += dx * LERP;
+        pos.y += dy * LERP;
+      } else {
+        pos.x = target.x;
+        pos.y = target.y;
+      }
       orb.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
 
-      // Parallax grid per viewport — relative to viewport center, with diagonal tilt
-      viewports.forEach((vp) => {
-        const rect = vp.getBoundingClientRect();
+      // Parallax grid per cached viewport — no layout reads here.
+      for (const entry of vpCache) {
+        const { rect, grid } = entry;
+        if (!grid) continue;
         const ccx = rect.left + rect.width / 2;
         const ccy = rect.top + rect.height / 2;
-        const dx = (pos.x - ccx) * -0.03;
-        const dy = (pos.y - ccy) * -0.03;
-        const px = (pos.x - ccx) / rect.width;
-        const py = (pos.y - ccy) / rect.height;
-        // Tilt OPOSTO à direção do mouse (não segue) — match d8 intent:
-        // mouse pra direita → plano rotaciona anti-horário (tilt diminui)
-        const tilt = BASE_TILT - px * TILT_X_AMP + py * TILT_Y_AMP;
-        const grid = vp.querySelector('.grid-layer');
-        if (grid) grid.style.transform = `translate(${dx}px, ${dy}px) rotate(${tilt}deg)`;
-      });
+        const dxv = (pos.x - ccx) * -0.03;
+        const dyv = (pos.y - ccy) * -0.03;
+        const pxv = (pos.x - ccx) / rect.width;
+        const pyv = (pos.y - ccy) / rect.height;
+        // Tilt OPOSTO à direção do mouse (não segue) — match d8 intent.
+        const tilt = BASE_TILT - pxv * TILT_X_AMP + pyv * TILT_Y_AMP;
+        grid.style.transform = `translate(${dxv}px, ${dyv}px) rotate(${tilt}deg)`;
+      }
 
-      // Coord label — cartesian (x, y) relative to desktop viewport center
-      if (coordLabel && desktopVP) {
-        const rect = desktopVP.getBoundingClientRect();
+      // Coord label — cartesian (x, y) relative to desktop viewport center.
+      if (coordLabel && desktopRect) {
         const inside =
-          pos.x >= rect.left && pos.x <= rect.right &&
-          pos.y >= rect.top && pos.y <= rect.bottom;
+          pos.x >= desktopRect.left && pos.x <= desktopRect.right &&
+          pos.y >= desktopRect.top && pos.y <= desktopRect.bottom;
         if (inside) {
-          const cx = Math.round((pos.x - (rect.left + rect.width / 2)) / UNIT);
-          const cy = Math.round(((rect.top + rect.height / 2) - pos.y) / UNIT);
-          coordLabel.textContent = `(${cx}, ${cy})`;
+          const cxv = Math.round((pos.x - (desktopRect.left + desktopRect.width / 2)) / UNIT);
+          const cyv = Math.round(((desktopRect.top + desktopRect.height / 2) - pos.y) / UNIT);
+          coordLabel.textContent = `(${cxv}, ${cyv})`;
           coordLabel.style.transform = `translate(${pos.x + 18}px, ${pos.y - 28}px)`;
           coordLabel.classList.add('visible');
         } else {
@@ -941,9 +984,9 @@
         }
       }
 
-      requestAnimationFrame(raf);
+      if (moved) schedule();
     }
-    if (!prefersReduced) requestAnimationFrame(raf);
+    schedule();
 
     // Command palette open/close
     const fab = document.getElementById('fab');

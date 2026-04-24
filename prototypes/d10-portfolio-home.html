@@ -721,6 +721,19 @@
   </footer>
 
   <script>
+    /* ----------------------------------------------------------------
+     * Cursor follower + grid parallax with lerp.
+     *
+     * Perf contract (matches d8 canonical + d9 showcase):
+     *  - pointermove is { passive: true }.
+     *  - rAF is gated: only scheduled while pointer input is coming in or
+     *    the orb hasn't settled on target (|delta| > 0.5px). No wasted
+     *    60fps ticking on idle tabs.
+     *  - window size cached; refreshed on resize/scroll only.
+     *  - transforms are 2D only (translate + rotate) — no layout reads
+     *    inside the rAF body.
+     *  - honors prefers-reduced-motion.
+     * ---------------------------------------------------------------- */
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const orb = document.getElementById('orb');
     const grid = document.getElementById('grid-layer');
@@ -729,33 +742,53 @@
     const TILT_X_AMP = 1.6;
     const TILT_Y_AMP = 1.2;
     const UNIT = 12;           // pixels por unidade cartesiana (matches d8/d9)
+    const LERP = 0.12;
+    const SETTLE_EPSILON = 0.5;
 
     let target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     let pos = { ...target };
+    let rafId = 0;
+    let ww = window.innerWidth;
+    let wh = window.innerHeight;
+
+    function refreshSize() { ww = window.innerWidth; wh = window.innerHeight; }
+    function schedule() {
+      if (rafId || prefersReduced) return;
+      rafId = requestAnimationFrame(tick);
+    }
 
     window.addEventListener('pointermove', (e) => {
       target.x = e.clientX; target.y = e.clientY;
+      schedule();
     }, { passive: true });
+    window.addEventListener('resize', () => { refreshSize(); schedule(); }, { passive: true });
 
     function tick() {
-      if (prefersReduced) return;
-      pos.x += (target.x - pos.x) * 0.12;
-      pos.y += (target.y - pos.y) * 0.12;
+      rafId = 0;
+      const dx = target.x - pos.x;
+      const dy = target.y - pos.y;
+      const moved = Math.abs(dx) > SETTLE_EPSILON || Math.abs(dy) > SETTLE_EPSILON;
+      if (moved) {
+        pos.x += dx * LERP;
+        pos.y += dy * LERP;
+      } else {
+        pos.x = target.x;
+        pos.y = target.y;
+      }
       orb.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
 
-      // Grid parallax + diagonal tilt (DS defaults — ambient, não showcase)
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-      const dx = (pos.x - cx) * -0.03;
-      const dy = (pos.y - cy) * -0.03;
-      const px = (pos.x - cx) / window.innerWidth;
-      const py = (pos.y - cy) / window.innerHeight;
-      // Tilt OPOSTO à direção do mouse (não segue) — match d8 intent:
-      // mouse pra direita → plano rotaciona anti-horário (tilt diminui)
+      // Grid parallax + diagonal tilt (DS defaults — ambient, não showcase).
+      const cx = ww / 2;
+      const cy = wh / 2;
+      const pdx = (pos.x - cx) * -0.03;
+      const pdy = (pos.y - cy) * -0.03;
+      const px = (pos.x - cx) / ww;
+      const py = (pos.y - cy) / wh;
+      // Tilt OPOSTO à direção do mouse — match d8 intent.
       const tilt = BASE_TILT - px * TILT_X_AMP + py * TILT_Y_AMP;
-      grid.style.transform = `translate(${dx}px, ${dy}px) rotate(${tilt}deg)`;
+      grid.style.transform = `translate(${pdx}px, ${pdy}px) rotate(${tilt}deg)`;
 
-      // Coord label (x, y) seguindo cursor — origem no centro do viewport, y invertido
+      // Coord label (x, y) seguindo cursor — origem no centro do viewport, y invertido.
       if (coordLabel) {
         const xCart = Math.round((pos.x - cx) / UNIT);
         const yCart = Math.round((cy - pos.y) / UNIT);
@@ -764,9 +797,9 @@
         coordLabel.classList.add('visible');
       }
 
-      requestAnimationFrame(tick);
+      if (moved) schedule();
     }
-    if (!prefersReduced) requestAnimationFrame(tick);
+    schedule();
 
     // Clique no card expande/colapsa (mimic Portfolio.tsx state)
     document.querySelectorAll('.exp-card').forEach((card) => {

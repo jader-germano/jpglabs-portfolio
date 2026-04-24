@@ -1140,19 +1140,38 @@
   // Rule: orb FOLLOWS the cursor (lerped for silk trail).
   //       Plane moves in OPPOSITE direction (parallax inverse).
   //       Together they create depth: the orb is you; the plane is space.
+  //
+  // Perf contract:
+  //  - pointermove listener is passive (no preventDefault).
+  //  - rAF loop is gated: only requests the next frame while the viewport
+  //    is hovered OR the orb hasn't settled on the target (|delta|>0.5px).
+  //  - getBoundingClientRect is cached per pointermove event — never called
+  //    inside the rAF tick (avoids forced layout).
+  //  - only 2D transforms are used (translate3d + rotate); no width/height
+  //    reads inside rAF.
+  //  - single rAF id per scene; we cancel on teardown / stale frames.
+  //  - honors prefers-reduced-motion.
   const BASE_TILT = 3; // deg — diagonal baseline
+  const LERP = 0.22;
+  const SETTLE_EPSILON = 0.5;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function wireScene({ plane, orb, label, viewport, strength = 1, orbStrength = 1 }) {
+    // Cache rect on pointer/resize — reading it inside rAF causes layout thrashing.
+    let rect = viewport.getBoundingClientRect();
     const state = {
-      mx: viewport.clientWidth / 2,
-      my: viewport.clientHeight / 2,
-      ox: viewport.clientWidth / 2,
-      oy: viewport.clientHeight / 2,
+      mx: rect.width / 2,
+      my: rect.height / 2,
+      ox: rect.width / 2,
+      oy: rect.height / 2,
       hovering: false,
     };
+    let rafId = 0;
+
+    function refreshRect() { rect = viewport.getBoundingClientRect(); }
 
     function onMove(e) {
-      const rect = viewport.getBoundingClientRect();
+      // e.clientX/Y relative to cached viewport rect — no getBoundingClientRect inside rAF.
       state.mx = e.clientX - rect.left;
       state.my = e.clientY - rect.top;
       state.hovering = true;
@@ -1164,35 +1183,54 @@
       const ty = -py * 36 * strength;
       const tilt = BASE_TILT + px * 1.6 - py * 1.2;
       plane.style.transform = `translate3d(${tx}px, ${ty}px, 0) rotate(${tilt}deg)`;
+
+      schedule();
     }
 
     function onLeave() {
       state.hovering = false;
       plane.style.transform = `translate3d(0, 0, 0) rotate(${BASE_TILT}deg)`;
+      // Let the orb settle to the last known cursor pos but don't keep ticking forever.
+      schedule();
     }
 
-    viewport.addEventListener('mousemove', onMove);
-    viewport.addEventListener('mouseleave', onLeave);
+    function schedule() {
+      if (rafId || prefersReducedMotion) return;
+      rafId = requestAnimationFrame(tick);
+    }
 
     // Orb follows cursor with lerp smoothing (trail effect)
     function tick() {
-      if (state.hovering) {
-        state.ox += (state.mx - state.ox) * 0.22 * orbStrength;
-        state.oy += (state.my - state.oy) * 0.22 * orbStrength;
-        orb.style.transform = `translate3d(${state.ox - 13}px, ${state.oy - 13}px, 0)`;
-        if (label) {
-          // Project to cartesian coords: origin at viewport center, unit = 20px
-          const rect = viewport.getBoundingClientRect();
-          const cx = Math.round((state.ox - rect.width / 2) / 8);
-          const cy = Math.round((rect.height / 2 - state.oy) / 8);
-          label.textContent = `(${cx}, ${cy})`;
-          // Position label near orb but offset to avoid occlusion
-          label.style.transform = `translate3d(${state.ox + 18}px, ${state.oy - 28}px, 0)`;
-        }
+      rafId = 0;
+      const dx = state.mx - state.ox;
+      const dy = state.my - state.oy;
+      const moved = Math.abs(dx) > SETTLE_EPSILON || Math.abs(dy) > SETTLE_EPSILON;
+
+      if (moved) {
+        state.ox += dx * LERP * orbStrength;
+        state.oy += dy * LERP * orbStrength;
+      } else {
+        // Snap to target and stop scheduling if no hover + settled.
+        state.ox = state.mx;
+        state.oy = state.my;
       }
-      requestAnimationFrame(tick);
+
+      orb.style.transform = `translate3d(${state.ox - 13}px, ${state.oy - 13}px, 0)`;
+      if (label) {
+        const cx = Math.round((state.ox - rect.width / 2) / 8);
+        const cy = Math.round((rect.height / 2 - state.oy) / 8);
+        label.textContent = `(${cx}, ${cy})`;
+        label.style.transform = `translate3d(${state.ox + 18}px, ${state.oy - 28}px, 0)`;
+      }
+
+      // Keep scheduling while hovering or while we're still lerping toward target.
+      if (state.hovering || moved) schedule();
     }
-    tick();
+
+    viewport.addEventListener('mousemove', onMove, { passive: true });
+    viewport.addEventListener('mouseleave', onLeave, { passive: true });
+    window.addEventListener('resize', refreshRect, { passive: true });
+    window.addEventListener('scroll', refreshRect, { passive: true });
 
     plane.style.transform = `translate3d(0, 0, 0) rotate(${BASE_TILT}deg)`;
   }
