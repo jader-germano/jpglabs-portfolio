@@ -12,7 +12,7 @@ export default function PrivacyPageClient() {
       <main className="relative mx-auto max-w-4xl px-6 py-20">
         <Link
           to="/login"
-          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[10px] font-black uppercase tracking-[0.28em] text-gray-400 transition-all hover:border-red-500/30 hover:text-white"
+          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-[0.28em] text-gray-400 transition-all hover:border-red-500/30 hover:text-white"
         >
           <ChevronLeft size={14} />
           {dictionary.privacy.back}
@@ -24,7 +24,7 @@ export default function PrivacyPageClient() {
               <LockKeyhole size={24} />
             </div>
             <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.35em] text-red-400">{dictionary.privacy.eyebrow}</p>
+              <p className="text-[11px] font-mono font-bold uppercase tracking-[0.35em] text-red-400">{dictionary.privacy.eyebrow}</p>
               <h1 className="mt-2 text-4xl font-black tracking-tight md:text-5xl">{dictionary.privacy.title}</h1>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-400">{dictionary.privacy.description}</p>
             </div>
@@ -40,7 +40,7 @@ export default function PrivacyPageClient() {
           </div>
 
           <div className="mt-8 rounded-3xl border border-red-500/10 bg-red-500/5 p-6 text-sm leading-7 text-gray-300">
-            <p className="font-black uppercase tracking-[0.24em] text-red-300">
+            <p className="font-mono font-bold uppercase tracking-[0.24em] text-red-300">
               {locale === "pt" ? "Controlador e vigência" : "Controller and effective date"}
             </p>
             <p className="mt-3">

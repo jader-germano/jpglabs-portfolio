@@ -155,7 +155,7 @@ export default function LoginPageClient() {
         {isEmailOpen ? (
           <form onSubmit={handleEmailSignIn} className="mt-5 space-y-3 text-left">
             <label className="block">
-              <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">{dictionary.login.emailLabel}</span>
+              <span className="mb-2 block text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-gray-500">{dictionary.login.emailLabel}</span>
               <input
                 type="email"
                 value={email}
@@ -167,7 +167,7 @@ export default function LoginPageClient() {
             </label>
 
             <label className="block">
-              <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">{dictionary.login.passwordLabel}</span>
+              <span className="mb-2 block text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-gray-500">{dictionary.login.passwordLabel}</span>
               <input
                 type="password"
                 value={password}
@@ -196,7 +196,7 @@ export default function LoginPageClient() {
             J
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.34em] text-gray-500">{dictionary.login.brandTitle}</p>
+            <p className="text-[10px] font-mono font-bold uppercase tracking-[0.34em] text-gray-500">{dictionary.login.brandTitle}</p>
             <p className="mt-1 text-xs text-gray-400">{dictionary.login.brandSubtitle}</p>
           </div>
         </Link>

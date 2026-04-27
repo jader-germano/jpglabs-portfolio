@@ -237,7 +237,7 @@ export default function InstancesDashboardClient() {
                   <p className="text-lg font-black tracking-tight">{lane.name}</p>
                   <p className="mt-2 text-sm leading-relaxed text-gray-500">{lane.summary}</p>
                 </div>
-                <span className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] ${STATUS_STYLES[lane.status]}`}>
+                <span className={`rounded-full border px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.2em] ${STATUS_STYLES[lane.status]}`}>
                   {lane.status}
                 </span>
               </div>
@@ -247,7 +247,7 @@ export default function InstancesDashboardClient() {
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {lane.meta.map((item) => (
                   <div key={`${lane.id}-${item.label}`} className="rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-3">
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-600">{item.label}</p>
+                    <p className="text-[10px] font-mono font-bold uppercase tracking-[0.24em] text-gray-600">{item.label}</p>
                     <p className="mt-2 text-sm font-mono text-gray-200">{item.value}</p>
                   </div>
                 ))}

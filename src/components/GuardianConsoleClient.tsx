@@ -146,7 +146,7 @@ export default function GuardianConsoleClient() {
             </div>
 
             <div className="text-right">
-              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-600">{copy.source}</p>
+              <p className="text-[10px] font-mono font-bold uppercase tracking-[0.24em] text-gray-600">{copy.source}</p>
               <p className="mt-2 text-sm font-mono text-gray-300">{snapshot?.source ?? "—"}</p>
               {updatedAt ? <p className="mt-2 text-[10px] text-gray-500">{copy.updatedAt}: {updatedAt}</p> : null}
             </div>
@@ -160,7 +160,7 @@ export default function GuardianConsoleClient() {
               >
                 <div>
                   <p className="text-sm font-black uppercase tracking-tight text-white">{check.name}</p>
-                  <p className="mt-2 text-[10px] font-black uppercase tracking-[0.24em] text-gray-600">{check.id}</p>
+                  <p className="mt-2 text-[10px] font-mono font-bold uppercase tracking-[0.24em] text-gray-600">{check.id}</p>
                 </div>
 
                 <div>
@@ -169,7 +169,7 @@ export default function GuardianConsoleClient() {
                 </div>
 
                 <div className="flex items-start justify-end">
-                  <span className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] ${STATUS_STYLES[check.status]}`}>
+                  <span className={`rounded-full border px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.2em] ${STATUS_STYLES[check.status]}`}>
                     {check.status}
                   </span>
                 </div>
