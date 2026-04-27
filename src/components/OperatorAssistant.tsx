@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Bot, Loader2, SendHorizonal, Sparkles } from "lucide-react";
+import { Kicker } from "@jpglabs/cartesian-ui";
 import { portfolioApiBaseUrl } from "../lib/portfolio-api";
 
 type OperatorAssistantProps = {
@@ -27,7 +28,7 @@ export default function OperatorAssistant({ accessToken, role }: OperatorAssista
       <header className="mb-8 rounded-[32px] border border-white/5 bg-white/[0.02] p-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-red-400">AI SDK Frontend</p>
+            <Kicker color="accent" spacing="wide">AI SDK Frontend</Kicker>
             <h1 className="mt-3 flex items-center gap-3 text-3xl font-black tracking-tighter">
               <Bot className="text-red-500" />
               Operator Assistant
@@ -39,7 +40,7 @@ export default function OperatorAssistant({ accessToken, role }: OperatorAssista
           </div>
 
           <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-5 py-4">
-            <p className="text-[10px] font-mono font-bold uppercase tracking-[0.24em] text-red-200">Authenticated role</p>
+            <Kicker color="accent">Authenticated role</Kicker>
             <p className="mt-2 text-lg font-black text-white">{role}</p>
           </div>
         </div>
@@ -63,7 +64,7 @@ export default function OperatorAssistant({ accessToken, role }: OperatorAssista
                     : "border-white/5 bg-black/30"
                 }`}
               >
-                <p className="text-[10px] font-mono font-bold uppercase tracking-[0.24em] text-gray-500">{message.role}</p>
+                <Kicker>{message.role}</Kicker>
                 <div className="mt-3 space-y-3 text-sm leading-7 text-gray-200">
                   {(message.parts ?? []).map((part, index) => {
                     if (part.type === "text") {
@@ -100,9 +101,9 @@ export default function OperatorAssistant({ accessToken, role }: OperatorAssista
             />
 
             <div className="flex items-center justify-between gap-4">
-              <p className="text-[10px] font-mono font-bold uppercase tracking-[0.24em] text-gray-600">
+              <Kicker color="faint">
                 {isWorking ? "Streaming response" : "Ready"}
-              </p>
+              </Kicker>
 
               <button
                 type="submit"

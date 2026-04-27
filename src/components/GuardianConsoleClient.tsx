@@ -13,6 +13,7 @@ import { useAuth } from "../context/AuthContext";
 import { portfolioApiBaseUrl } from "../lib/portfolio-api";
 import { fetchWithAuth } from "../lib/fetch-with-auth";
 import type { PiDashboardSnapshot } from "../lib/pi-runtime";
+import { Kicker } from "@jpglabs/cartesian-ui";
 
 const STATUS_STYLES = {
   online: "bg-green-500/10 text-green-400 border-green-500/20",
@@ -146,7 +147,7 @@ export default function GuardianConsoleClient() {
             </div>
 
             <div className="text-right">
-              <p className="text-[10px] font-mono font-bold uppercase tracking-[0.24em] text-gray-600">{copy.source}</p>
+              <Kicker color="faint">{copy.source}</Kicker>
               <p className="mt-2 text-sm font-mono text-gray-300">{snapshot?.source ?? "—"}</p>
               {updatedAt ? <p className="mt-2 text-[10px] text-gray-500">{copy.updatedAt}: {updatedAt}</p> : null}
             </div>
@@ -160,7 +161,7 @@ export default function GuardianConsoleClient() {
               >
                 <div>
                   <p className="text-sm font-black uppercase tracking-tight text-white">{check.name}</p>
-                  <p className="mt-2 text-[10px] font-mono font-bold uppercase tracking-[0.24em] text-gray-600">{check.id}</p>
+                  <Kicker color="faint" className="mt-2">{check.id}</Kicker>
                 </div>
 
                 <div>

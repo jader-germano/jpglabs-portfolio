@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Github, Globe, Loader2, Mail, ShieldCheck } from "lucide-react";
+import { Kicker } from "@jpglabs/cartesian-ui";
 import { useLanguage } from "../context/LanguageProvider";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -155,7 +156,7 @@ export default function LoginPageClient() {
         {isEmailOpen ? (
           <form onSubmit={handleEmailSignIn} className="mt-5 space-y-3 text-left">
             <label className="block">
-              <span className="mb-2 block text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-gray-500">{dictionary.login.emailLabel}</span>
+              <Kicker as="span" className="mb-2 block" spacing="wide">{dictionary.login.emailLabel}</Kicker>
               <input
                 type="email"
                 value={email}
@@ -167,7 +168,7 @@ export default function LoginPageClient() {
             </label>
 
             <label className="block">
-              <span className="mb-2 block text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-gray-500">{dictionary.login.passwordLabel}</span>
+              <Kicker as="span" className="mb-2 block" spacing="wide">{dictionary.login.passwordLabel}</Kicker>
               <input
                 type="password"
                 value={password}
@@ -196,7 +197,7 @@ export default function LoginPageClient() {
             J
           </div>
           <div>
-            <p className="text-[10px] font-mono font-bold uppercase tracking-[0.34em] text-gray-500">{dictionary.login.brandTitle}</p>
+            <Kicker spacing="loose">{dictionary.login.brandTitle}</Kicker>
             <p className="mt-1 text-xs text-gray-400">{dictionary.login.brandSubtitle}</p>
           </div>
         </Link>

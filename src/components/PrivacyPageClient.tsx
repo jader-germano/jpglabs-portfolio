@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ChevronLeft, LockKeyhole } from "lucide-react";
+import { Eyebrow } from "@jpglabs/cartesian-ui";
 import { useLanguage } from "../context/LanguageProvider";
 
 export default function PrivacyPageClient() {
@@ -24,7 +25,7 @@ export default function PrivacyPageClient() {
               <LockKeyhole size={24} />
             </div>
             <div>
-              <p className="text-[11px] font-mono font-bold uppercase tracking-[0.35em] text-red-400">{dictionary.privacy.eyebrow}</p>
+              <Eyebrow spacing="loose">{dictionary.privacy.eyebrow}</Eyebrow>
               <h1 className="mt-2 text-4xl font-black tracking-tight md:text-5xl">{dictionary.privacy.title}</h1>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-400">{dictionary.privacy.description}</p>
             </div>

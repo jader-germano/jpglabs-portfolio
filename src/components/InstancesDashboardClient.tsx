@@ -17,6 +17,7 @@ import { DASHBOARD_ROUTE_INVENTORY } from "../lib/dashboard-routes";
 import { portfolioApiBaseUrl } from "../lib/portfolio-api";
 import { fetchWithAuth } from "../lib/fetch-with-auth";
 import type { PiDashboardSnapshot } from "../lib/pi-runtime";
+import { Kicker } from "@jpglabs/cartesian-ui";
 
 const STATUS_STYLES = {
   online: "bg-green-500/10 text-green-400 border-green-500/20",
@@ -247,7 +248,7 @@ export default function InstancesDashboardClient() {
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {lane.meta.map((item) => (
                   <div key={`${lane.id}-${item.label}`} className="rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-3">
-                    <p className="text-[10px] font-mono font-bold uppercase tracking-[0.24em] text-gray-600">{item.label}</p>
+                    <Kicker color="faint">{item.label}</Kicker>
                     <p className="mt-2 text-sm font-mono text-gray-200">{item.value}</p>
                   </div>
                 ))}
