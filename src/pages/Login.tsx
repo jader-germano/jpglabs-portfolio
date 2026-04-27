@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Github, Chrome, Apple, ShieldAlert, LogIn } from 'lucide-react';
+import { Chrome, ShieldAlert, LogIn } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ROUTES } from '../config/routes';
@@ -11,7 +11,7 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [oauthLoading, setOauthLoading] = useState<'github' | 'google' | 'apple' | null>(null);
+  const [oauthLoading, setOauthLoading] = useState<'google' | null>(null);
 
   const { login, loginWithOAuth } = useAuth();
   const navigate = useNavigate();
@@ -106,20 +106,7 @@ const LoginPage: React.FC = () => {
               <div className="absolute top-1/2 left-0 w-full h-[1px] bg-border-subtle"></div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <button
-                type="button"
-                disabled={oauthLoading !== null}
-                onClick={async () => {
-                  setError('');
-                  setOauthLoading('github');
-                  try { await loginWithOAuth('github'); } catch { setError('Falha ao iniciar login com GitHub.'); setOauthLoading(null); }
-                }}
-                className="flex items-center justify-center gap-2 bg-surface border border-border-subtle py-4 rounded-2xl hover:border-accent/50 hover:text-accent text-text-dim transition-colors group disabled:opacity-50"
-              >
-                <Github size={18} className="group-hover:text-accent transition-colors" />
-                <span className="text-[10px] font-black uppercase group-hover:text-accent">{oauthLoading === 'github' ? '...' : 'GitHub'}</span>
-              </button>
+            <div className="grid grid-cols-1 gap-3">
               <button
                 type="button"
                 disabled={oauthLoading !== null}
@@ -132,19 +119,6 @@ const LoginPage: React.FC = () => {
               >
                 <Chrome size={18} className="group-hover:text-accent transition-colors" />
                 <span className="text-[10px] font-black uppercase group-hover:text-accent">{oauthLoading === 'google' ? '...' : 'Google'}</span>
-              </button>
-              <button
-                type="button"
-                disabled={oauthLoading !== null}
-                onClick={async () => {
-                  setError('');
-                  setOauthLoading('apple');
-                  try { await loginWithOAuth('apple'); } catch { setError('Falha ao iniciar login com Apple.'); setOauthLoading(null); }
-                }}
-                className="flex items-center justify-center gap-2 bg-surface border border-border-subtle py-4 rounded-2xl hover:border-accent/50 hover:text-accent text-text-dim transition-colors group disabled:opacity-50"
-              >
-                <Apple size={18} className="group-hover:text-accent transition-colors" />
-                <span className="text-[10px] font-black uppercase group-hover:text-accent">{oauthLoading === 'apple' ? '...' : 'Apple'}</span>
               </button>
             </div>
 
